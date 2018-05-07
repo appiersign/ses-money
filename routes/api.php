@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,8 +14,14 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/', function (Request $request) {
-    return 'you made it';
+Route::middleware('merchant')->group( function() {
+    Route::post('debit', function (Request $request){
+        return $request->all();
+    });
+
+    Route::get('', function (Request $request){
+        return $request->all();
+    });
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {

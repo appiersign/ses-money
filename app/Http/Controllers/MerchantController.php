@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateMerchant;
+use App\Merchant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MerchantController extends Controller
 {
@@ -32,9 +35,16 @@ class MerchantController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateMerchant $request)
     {
-        //
+        try {
+            $job = new \App\Jobs\CreateMerchant($request->all());
+            $this->dispatch($job);
+            return Merchant::latest('created_at')->first();
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+
+        }
     }
 
     /**
@@ -43,7 +53,7 @@ class MerchantController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Merchant $merchant)
     {
         //
     }
@@ -54,7 +64,7 @@ class MerchantController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Merchant $merchant)
     {
         //
     }
@@ -66,19 +76,70 @@ class MerchantController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CreateMerchant $request, Merchant $merchant)
     {
-        //
+        $merchant->setEmailAttribute($request->input('email', $merchant->getEmailAttribute()));
+        $merchant->setNameAttribute($request->input('name', $merchant->getNameAttribute()));
+        $merchant->setAddressAttribute($request->input('address', $merchant->getAddressAttribute()));
+        $merchant->setPhoneNumberAttribute($request->input('phone_number', $merchant->getPhoneNumberAttribute()));
+
+        try {
+            $merchant->save();
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Merchant $merchant
+     * @return string
      */
-    public function destroy($id)
+    public function destroy(Merchant $merchant)
     {
-        //
+        try {
+            $merchant->delete();
+            return 'deleted';
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+        }
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $merchant = Merchant::where('ses_money_id', $request->ses_money_id)->first();
+        if ($merchant <> null) {
+            $merchant->password = bcrypt('admin');
+            $merchant->save();
+            return 'password reset successful';
+        } else {
+            return 'merchant does not exist';
+        }
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $this->validate($request, [
+            'old' => 'required|min:5|max:20',
+            'password' => 'required|min:5|max:20',
+        ]);
+    }
+
+    public function toggleStatus($ses_money_id)
+    {
+        $merchant = Merchant::where('ses_money_id', $ses_money_id)->first();
+        if ($merchant <> null) {
+            if ($merchant->is_active) {
+                $merchant->is_active = false;
+            } else {
+                $merchant->is_active = true;
+            }
+
+            $merchant->save();
+            return 'merchant status updated';
+        } else {
+            return 'status could not be updated';
+        }
     }
 }

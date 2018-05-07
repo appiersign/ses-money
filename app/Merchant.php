@@ -2,11 +2,28 @@
 
 namespace App;
 
+use App\Jobs\CreateMerchant;
 use Illuminate\Database\Eloquent\Model;
 
 class Merchant extends Model
 {
     private $route;
+
+    protected $fillable = [
+        'name',
+        'email',
+        'ses_money_id',
+        'api_user',
+        'api_key',
+        'password',
+        'merchant_id',
+        'address',
+        'phone_number',
+        'is_active',
+        'limit'
+    ];
+
+    protected $hidden = ['password'];
 
     public function __construct(array $attributes = [])
     {
@@ -33,14 +50,19 @@ class Merchant extends Model
         return $this->attributes['email'];
     }
 
-    public function setTelephoneAttribute($telephone)
+    public function setSesMoneyId($value)
     {
-        $this->attributes['telephone'] = $telephone;
+        $this->attributes['ses_money_id'] = strtoupper($value);
     }
 
-    public function getTelephoneAttribute()
+    public function setPhoneNumberAttribute($telephone)
     {
-        return $this->attributes['telephone'];
+        $this->attributes['phone_number'] = $telephone;
+    }
+
+    public function getPhoneNumberAttribute()
+    {
+        return $this->attributes['phone_number'];
     }
 
     public function setAddressAttribute($address)
@@ -53,6 +75,21 @@ class Merchant extends Model
         return $this->attributes['address'];
     }
 
+    public function setAccountIssuerAttribute($value)
+    {
+        $this->attributes['account_issuer'] = $value;
+    }
+
+    public function setAccountNumberAttribute($value)
+    {
+        $this->attributes['account_number'] = $value;
+    }
+
+    public function setAccountBranchAttribute($value)
+    {
+        $this->attributes['account_branch'] = $value;
+    }
+
     public function setRoute($path = 'Merchant Registration')
     {
         $this->route = $path;
@@ -61,10 +98,5 @@ class Merchant extends Model
     public function getRoute()
     {
         return $this->route;
-    }
-
-    public function create()
-    {
-        return $this->getNameAttribute();
     }
 }
