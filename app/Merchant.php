@@ -33,14 +33,14 @@ class Merchant extends Model
         return $this->attributes['email'];
     }
 
-    public function setTelephoneAttribute($telephone)
+    public function setPhoneNumberAttribute($telephone)
     {
-        $this->attributes['telephone'] = $telephone;
+        $this->attributes['phone_number'] = $telephone;
     }
 
-    public function getTelephoneAttribute()
+    public function getPhoneNumberAttribute()
     {
-        return $this->attributes['telephone'];
+        return $this->attributes['phone_number'];
     }
 
     public function setAddressAttribute($address)

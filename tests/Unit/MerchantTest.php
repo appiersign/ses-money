@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Merchant;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -20,8 +21,9 @@ class MerchantTest extends TestCase
 
     public function testMerchantLogin()
     {
+        $merchant = factory(Merchant::class)->make();
         $this->assertDatabaseMissing('merchants', [
-            'email' => 'solomon@qisimah.com'
+            'email' => $merchant->email
         ]);
     }
 }
