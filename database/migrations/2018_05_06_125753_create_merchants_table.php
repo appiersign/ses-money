@@ -24,6 +24,9 @@ class CreateMerchantsTable extends Migration
             $table->string('password');
             $table->string('phone_number');
             $table->string('address');
+            $table->string('account_issuer')->nullable();
+            $table->string('account_number')->nullable();
+            $table->string('account_branch')->nullable();
             $table->string('actions')->default('payment');
             $table->decimal('limit')->default(500.00);
             $table->boolean('is_active')->default(1);

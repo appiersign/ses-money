@@ -10,7 +10,7 @@ $factory->define(App\Merchant::class, function (Faker $faker) {
         'merchant_id' => str_random(10),
         'phone_number' => $faker->phoneNumber,
         'address' => $faker->address,
-        'password' => $faker->password,
+        'password' => bcrypt('admin'),
         'api_user' => $faker->userName,
         'api_key' => str_random(32)
     ];
