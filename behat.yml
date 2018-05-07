@@ -1,0 +1,6 @@
+default:
+    autoload:
+        '': features/bootstrap
+    suites:
+        default:
+            contexts: [MerchantContext]
