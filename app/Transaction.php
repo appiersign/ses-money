@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Transaction extends Model
 {
@@ -44,6 +45,23 @@ class Transaction extends Model
     private function airtime()
     {
 //        check for the network and route accordingly
+    }
+
+    public function postCurlRequest(string $url, array $headers, array $body)
+    {
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
+
+        try {
+            $response = curl_exec($curl);
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+        }
     }
 
     public function response($code)
