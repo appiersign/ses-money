@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Merchant;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,15 +16,19 @@ class PaymentTest extends TestCase
      */
     public function testMakePayment()
     {
-        $response = $this->postJson('payment/create', [
-            'merchant_id' => 'SES-000000001',
+        $merchant = factory(Merchant::class)->create();
+        $response = $this->postJson('api/payments', [
+            'merchant_id' => $merchant->merchant_id,
             'transaction_id' => time().'00',
             'description' => 'testing from the other side',
             'amount' => '000000000010',
             'provider' => 'MTN'
+        ],[
+            'Authorization' => 'Basic '.base64_encode("$merchant->api_user:$merchant->api_key")
         ]);
+
         $response->assertJson([
-            'merchant_id' => 'SES-000000001',
+            'merchant_id' => $merchant->merchant_id,
             'transaction_id' => time().'00',
             'description' => 'testing from the other side',
             'amount' => '000000000010',
