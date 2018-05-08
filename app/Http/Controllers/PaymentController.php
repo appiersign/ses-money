@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MakePaymentRequest;
-use App\Payment;
+use App\Jobs\MakePaymentJob;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -31,12 +32,28 @@ class PaymentController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(MakePaymentRequest $request)
     {
-        $payment = Payment::created();
+        try {
+            $job = new MakePaymentJob($request->all());
+            $this->dispatch($job);
+            return response()->json(array_merge($request->all(), [
+                'status' => 'failed',
+                'code' => 2000,
+                'reason' => 'payment could not be processed'
+            ]));
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+            return response()->json(array_merge($request->all(), [
+                'status' => 'failed',
+                'code' => 5000,
+                'reason' => 'payment could not be processed'
+            ]));
+        }
+
     }
 
     /**

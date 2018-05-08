@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Payment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -10,16 +11,16 @@ use Illuminate\Foundation\Bus\Dispatchable;
 
 class MakePaymentJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
+    private $payment;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(array $data)
     {
-        //
+        $this->payment = $data;
+        $this->payment['stan'] = '00'.time();
     }
 
     /**
@@ -29,6 +30,6 @@ class MakePaymentJob implements ShouldQueue
      */
     public function handle()
     {
-        //
+        Payment::create($this->payment);
     }
 }
