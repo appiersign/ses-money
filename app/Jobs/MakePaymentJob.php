@@ -12,6 +12,12 @@ use Illuminate\Foundation\Bus\Dispatchable;
 class MakePaymentJob implements ShouldQueue
 {
     private $payment;
+    private $response;
+
+    public function getMakePaymentResponse()
+    {
+        return $this->response;
+    }
     /**
      * Create a new job instance.
      *
@@ -31,5 +37,10 @@ class MakePaymentJob implements ShouldQueue
     public function handle()
     {
         Payment::create($this->payment);
+        $this->response = [
+            'status' => 'success',
+            'code' => 2000,
+            'reason' => 'payment request accepted'
+        ];
     }
 }
