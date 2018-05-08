@@ -7,34 +7,50 @@ use Illuminate\Support\Facades\Log;
 
 class Transaction extends Model
 {
-    private $data;
+    private $payment;
+    private $card_details = [];
+    private $response;
 
-    public function __construct(array $data = [])
+    /**
+     * Transaction constructor.
+     * @param Payment $payment
+     * @param string|null $cvv
+     * @param string|null $expiry_month
+     * @param string $expiry_year
+     */
+    public function __construct(Payment $payment, string $cvv = null, string $expiry_month = null, string  $expiry_year = null)
     {
-//        parent::__construct($data);
-        $this->data = $data;
+        $this->card_details['cvv']          = $cvv;
+        $this->card_details['expiry_month'] = $expiry_month;
+        $this->card_details['expiry_year']  = $expiry_year;
+        $this->payment = $payment;
     }
 
     public function process()
     {
         if ($this->data['action'] === 'debit') {
-//            pass to debit function
+            $this->debit();
         } elseif ($this->data['action'] === 'credit') {
-//            pass to credit functions
+            $this->credit();
         } elseif ($this->data['action'] === 'airtime') {
-//            pass to airtime function
+            $this->airtime();
         } else {
-            return [
+            $this->response = [
                 'status' => 'error',
                 'code' => 4000,
                 'reason' => 'unknown action'. $this->data['action']
             ];
         }
+
+        return $this;
     }
 
-    private function debit()
+    public function debit()
     {
-//        check for the provider and route accordingly
+        if (in_array($this->payment->provider, ['MAS', 'VIS'])){
+            $debit = new PaySwitch($this->payment, $this->card_details);
+            $this->response($debit->sendRequest()->getResponse());
+        }
     }
 
     private function credit()
@@ -47,18 +63,18 @@ class Transaction extends Model
 //        check for the network and route accordingly
     }
 
-    public function postCurlRequest(string $url, array $headers, array $body)
+    public static function postCurlRequest(array $data)
     {
-        $curl = curl_init($url);
+        $curl = curl_init($data[0]);
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $data[1]);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data[2]));
 
         try {
-            $response = curl_exec($curl);
+            return json_decode(curl_exec($curl), true);
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
         }
