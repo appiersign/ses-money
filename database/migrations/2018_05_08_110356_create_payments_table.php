@@ -21,6 +21,7 @@ class CreatePaymentsTable extends Migration
             $table->string('provider', 3);
             $table->string('amount', 12);
             $table->string('description', 100);
+            $table->string('response_url');
             $table->string('authorization_code')->nullable();
             $table->string('response_code')->nullable();
             $table->string('response_status')->nullable();

@@ -16,6 +16,7 @@ class Payment extends Model
         'authorization_code',
         'response_code',
         'response_status',
-        'response_message'
+        'response_message',
+        'response_url'
     ];
 }

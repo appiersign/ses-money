@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\MakePaymentRequest;
 use App\Jobs\MakePaymentJob;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -36,7 +37,7 @@ class PaymentController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(MakePaymentRequest $request): Response
+    public function store(MakePaymentRequest $request): JsonResponse
     {
         try {
             $job = new MakePaymentJob($request->all());

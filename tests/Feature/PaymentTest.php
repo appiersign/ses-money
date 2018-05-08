@@ -22,6 +22,7 @@ class PaymentTest extends TestCase
             'transaction_id' => time().'00',
             'description' => 'testing from the other side',
             'amount' => '000000000010',
+            'response_url' => 'https://qisimah.com',
             'provider' => 'MTN'
         ],[
             'Authorization' => 'Basic '.base64_encode("$merchant->api_user:$merchant->api_key")
@@ -32,6 +33,7 @@ class PaymentTest extends TestCase
             'transaction_id' => time().'00',
             'description' => 'testing from the other side',
             'amount' => '000000000010',
+            'response_url' => 'https://qisimah.com',
             'provider' => 'MTN'
         ]);
     }

@@ -24,11 +24,12 @@ class MakePaymentRequest extends FormRequest
     public function rules()
     {
         return [
-            'transaction_id' => 'bail|required|digits:12',
-            'merchant_id' => 'bail|required|exists:merchants',
-            'amount' => 'bail|required|digits:12',
-            'description' => 'bail|required|min:6|max:100',
-            'provider' => 'bail|required|size:3|in:MTN,TGO,ATL,VDF,VIS,MAS'
+            'transaction_id'    => 'bail|required|digits:12',
+            'merchant_id'       => 'bail|required|exists:merchants',
+            'amount'            => 'bail|required|digits:12',
+            'description'       => 'bail|required|min:6|max:100',
+            'response_url'      => 'bail|required|url',
+            'provider'          => 'bail|required|size:3|in:MTN,TGO,ATL,VDF,VIS,MAS'
         ];
     }
 }
