@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MakePaymentRequest;
+use App\Payment;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
@@ -32,9 +34,9 @@ class PaymentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(MakePaymentRequest $request)
     {
-        //
+        $payment = Payment::created();
     }
 
     /**

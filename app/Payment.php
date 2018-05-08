@@ -12,6 +12,7 @@ class Payment extends Model
         'transaction_id',
         'provider',
         'amount',
+        'description',
         'authorization_code',
         'response_code',
         'response_status',
