@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\MakePaymentRequest;
 use App\Jobs\MakePaymentJob;
+use App\Payment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -57,12 +58,12 @@ class PaymentController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Payment $payment
+     * @return Payment
      */
-    public function show($id)
+    public function show(Payment $payment): Payment
     {
-        //
+        return $payment;
     }
 
     /**
