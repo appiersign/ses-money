@@ -111,7 +111,7 @@ class Mtn extends Model
 
 
         $response = $response['responseCode'];
-        
+
     }
 
     public function getResponse()
