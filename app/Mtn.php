@@ -10,6 +10,8 @@ use SoapClient;
 class Mtn extends Model
 {
     private $response = [];
+    private $responseCode;
+    private $payment;
 
     /**
      * Mtn constructor.
@@ -34,22 +36,23 @@ class Mtn extends Model
         return $response;
     }
 
-    public function debit($number, $amount, $info, $transaction_id)
+    public function debit(Payment $payment)
     {
+        $this->payment = $payment;
         $expiry = new DateTime('tomorrow');
         $expiry = $expiry->format('Y-m-d');
         $params = array
         (
-            'mesg' => 'Request to pay for bill is being processed. Your invoice number is {inv}.',
+            'mesg' => "Payment Procedure\nDial *170#\nEnter 2 for Pay bill\nEnter 6 for general payment\nEnter {inv} as payment code\nEnter ".$this->payment->amount." as amount\nEnter MM PIN to authenticate\nEnter 1 to complete payment",
             'expiry' => $expiry,
             'username' => $this->username,
             'password' => $this->password,
             'name' => 'PaySwitch Company Ltd.',
-            'info' => $info,
-            'amt' => $amount,
-            'mobile' => $number,
+            'info' => $this->payment->description,
+            'amt' => (int) $this->payment->amount / 100,
+            'mobile' => '+233'.substr($this->payment->account_number, 1),
             'billprompt' => 3,
-            'thirdpartyID' => $transaction_id
+            'thirdpartyID' => $this->payment->stan
         );
 
 //        $this->mtn_debit = new Mtn();
@@ -69,11 +72,31 @@ class Mtn extends Model
         try {
             $response = $client->__soapCall('postInvoice', array($params));
             $response = get_object_vars($response);
-            $this->response = get_object_vars($response['return']);
+            $response = get_object_vars($response['return']);
+            $this->responseCode = $response['responseCode'];
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
-            $this->response['code'] = 9000;
+            $this->responseCode = 9000;
         }
 
+        return $this->getResponse();
+
+    }
+
+    public function getResponse()
+    {
+        switch ($this->responseCode) {
+            case "0000":
+                // payment request sent
+                $code = 2001;
+                break;
+
+            case "13SY":
+                // no set up data found
+                $code = 9001;
+                break;
+        }
+
+        return $code;
     }
 }

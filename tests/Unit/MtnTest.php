@@ -2,6 +2,9 @@
 
 namespace Tests\Unit;
 
+use App\Merchant;
+use App\Mtn;
+use App\Payment;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,8 +16,17 @@ class MtnTest extends TestCase
      *
      * @return void
      */
-    public function testExample()
+    public function testDebit()
     {
-        $this->assertTrue(true);
+        $merchant = factory(Merchant::class)->create();
+        $payment = factory(Payment::class)->create([
+            "provider" => 'MTN',
+            "account_number" => "0249621938",
+            "merchant_id" => $merchant->merchant_id
+        ]);
+
+        $mtn = new Mtn();
+
+        $this->assertSame(2001, $mtn->debit($payment));
     }
 }

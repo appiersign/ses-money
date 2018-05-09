@@ -31,6 +31,9 @@ class Transaction extends Model
         if (in_array($this->payment->provider, ['MAS', 'VIS'])){
             $pay_switch = new PaySwitch($this->payment, $this->card_details);
             $this->response = $pay_switch->sendRequest()->getResponseCode();
+        } elseif ($this->payment->provider === 'MTN') {
+            $mtn = new Mtn();
+            $this->response = $mtn->debit($this->payment);
         }
         return $this->getResponse();
     }
@@ -50,24 +53,40 @@ class Transaction extends Model
         switch ($this->response) {
             case 2000:
                 $response = [
-                    'status' => 'approved',
-                    "code" => 2000,
-                    "reason" => "payment approved"
+                    "status"    => "approved",
+                    "code"      => $this->response,
+                    "reason"    => "payment approved"
+                ];
+                break;
+
+            case 2001:
+                $response = [
+                    "status"    => "success",
+                    "code"      => $this->response,
+                    "reason"    => "payment request sent successfully"
                 ];
                 break;
 
             case 5000:
                 $response = [
-                    "status" => "error",
-                    "code" => 5000,
-                    "reason" => "payment could not be processed"
+                    "status"    => "error",
+                    "code"      => $this->response,
+                    "reason"    => "payment could not be processed"
+                ];
+                break;
+
+            case 9001:
+                $response = [
+                    "status"    => "failed",
+                    "code"      => $this->response,
+                    "reason"    => "payment could not be processed"
                 ];
                 break;
         }
 
-        $this->payment->response_code = $response['code'];
-        $this->payment->response_status = $response['status'];
-        $this->payment->response_message = $response['reason'];
+        $this->payment->response_code       = $response['code'];
+        $this->payment->response_status     = $response['status'];
+        $this->payment->response_message    = $response['reason'];
         $this->payment->save();
 
         return $response;
