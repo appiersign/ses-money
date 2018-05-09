@@ -18,6 +18,7 @@ class CreatePaymentsTable extends Migration
             $table->string('stan', 12)->unique()->index();
             $table->string('merchant_id', 12)->index();
             $table->string('transaction_id', 12)->index();
+            $table->string('account_number', 16)->index();
             $table->string('provider', 3);
             $table->string('amount', 12);
             $table->string('description', 100);
