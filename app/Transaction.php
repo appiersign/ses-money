@@ -26,25 +26,6 @@ class Transaction extends Model
         $this->payment = $payment;
     }
 
-    public function process()
-    {
-        if ($this->data['action'] === 'debit') {
-            $this->debit();
-        } elseif ($this->data['action'] === 'credit') {
-            $this->credit();
-        } elseif ($this->data['action'] === 'airtime') {
-            $this->airtime();
-        } else {
-            $this->response = [
-                'status' => 'error',
-                'code' => 4000,
-                'reason' => 'unknown action'. $this->data['action']
-            ];
-        }
-
-        return $this;
-    }
-
     public function debit()
     {
         if (in_array($this->payment->provider, ['MAS', 'VIS'])){
