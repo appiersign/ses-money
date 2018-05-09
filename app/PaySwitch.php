@@ -25,7 +25,7 @@ class PaySwitch extends Model
 
         $headers = [
             'Content-Type: application/json',
-            'Authorization: Basic '. base64_encode("testuser:MTk1NjQyMTQ4N3Rlc3R1c2VyVGh1LUZlYiAxNi0yMDE5")
+            'Authorization: Basic '. base64_encode(env('PAYSWITCH_API_USER').":".env('PAYSWITCH_API_TOKEN'))
         ];
 
         $body = [
@@ -42,13 +42,38 @@ class PaySwitch extends Model
             '3d_url_response'   => 'https://api.theteller.net'
         ];
 
-        $this->response = Transaction::postCurlRequest([$url, $headers, $body]);
+        $this->postCurl([$url, $headers, $body]);
 
         return $this;
     }
 
-    public function getResponse()
+    private function postCurl(array $data)
     {
+        $curl = curl_init($data[0]);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $data[1]);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data[2]));
+
+        try {
+            $this->response = json_decode(curl_exec($curl), true);
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+            $this->response = [
+                "status" => "failed",
+                "code" => 9000,
+                "reason" => "Error Occurred, try again later"
+            ];
+        }
+    }
+
+    public function getResponseCode()
+    {
+        $this->payment->authorization_code = substr($this->payment->authorization_code, 0, 3). $this->response['code'];
+        $this->payment->save();
+
         switch ($this->response['code']) {
             case '000':
                 $code = 2000;

@@ -26,31 +26,16 @@ class Transaction extends Model
         $this->payment = $payment;
     }
 
-    public function process()
-    {
-        if ($this->data['action'] === 'debit') {
-            $this->debit();
-        } elseif ($this->data['action'] === 'credit') {
-            $this->credit();
-        } elseif ($this->data['action'] === 'airtime') {
-            $this->airtime();
-        } else {
-            $this->response = [
-                'status' => 'error',
-                'code' => 4000,
-                'reason' => 'unknown action'. $this->data['action']
-            ];
-        }
-
-        return $this;
-    }
-
     public function debit()
     {
         if (in_array($this->payment->provider, ['MAS', 'VIS'])){
-            $debit = new PaySwitch($this->payment, $this->card_details);
-            $this->response($debit->sendRequest()->getResponse());
+            $pay_switch = new PaySwitch($this->payment, $this->card_details);
+            $this->response = $pay_switch->sendRequest()->getResponseCode();
+        } elseif ($this->payment->provider === 'MTN') {
+            $mtn = new Mtn();
+            $this->response = $mtn->debit($this->payment);
         }
+        return $this->getResponse();
     }
 
     private function credit()
@@ -63,25 +48,47 @@ class Transaction extends Model
 //        check for the network and route accordingly
     }
 
-    public static function postCurlRequest(array $data)
+    private function getResponse()
     {
-        $curl = curl_init($data[0]);
-        curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $data[1]);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data[2]));
+        switch ($this->response) {
+            case 2000:
+                $response = [
+                    "status"    => "approved",
+                    "code"      => $this->response,
+                    "reason"    => "payment approved"
+                ];
+                break;
 
-        try {
-            return json_decode(curl_exec($curl), true);
-        } catch (\Exception $exception) {
-            Log::error($exception->getMessage());
+            case 2001:
+                $response = [
+                    "status"    => "success",
+                    "code"      => $this->response,
+                    "reason"    => "payment request sent"
+                ];
+                break;
+
+            case 5000:
+                $response = [
+                    "status"    => "error",
+                    "code"      => $this->response,
+                    "reason"    => "payment could not be processed"
+                ];
+                break;
+
+            case 9001:
+                $response = [
+                    "status"    => "failed",
+                    "code"      => $this->response,
+                    "reason"    => "payment could not be processed"
+                ];
+                break;
         }
-    }
 
-    public function response($code)
-    {
-//        switch and return
+        $this->payment->response_code       = $response['code'];
+        $this->payment->response_status     = $response['status'];
+        $this->payment->response_message    = $response['reason'];
+        $this->payment->save();
+
+        return $response;
     }
 }

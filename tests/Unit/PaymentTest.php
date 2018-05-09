@@ -2,6 +2,8 @@
 
 namespace Tests\Unit;
 
+use App\Merchant;
+use App\Payment;
 use App\Transaction;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -16,29 +18,32 @@ class PaymentTest extends TestCase
      */
     public function testPostCurlRequest()
     {
-        $url = "https://api.theteller.net/v1.1/transaction/process";
-
-        $headers = [
-            'Content-Type: application/json',
-            'Authorization: Basic '. base64_encode("testuser:MTk1NjQyMTQ4N3Rlc3R1c2VyVGh1LUZlYiAxNi0yMDE5")
-        ];
-
         $body = [
-            'merchant_id' => 'TTM-00000001',
-            'transaction_id' => time().'11',
-            'desc' => 'testing from the other side',
-            'amount' => '000000000010',
-            'r-switch' => 'MAS',
-            'pan' => '5454410007344162',
-            'processing_code' => '000000',
-            'exp_month' => '10',
-            'exp_year' => '19',
-            'cvv' => '959',
-            '3d_url_response' => 'https://api.theteller.net'
+            'merchant_id'       => 'TTM-00000001',
+            'transaction_id'    => time().'11',
+            'desc'              => 'testing from the other side',
+            'amount'            => '000000000010',
+            'r-switch'          => 'MAS',
+            'pan'               => '5454410007344162',
+            'processing_code'   => '000000',
+            'exp_month'         => '10',
+            'exp_year'          => '19',
+            'cvv'               => '959',
+            '3d_url_response'   => 'https://api.theteller.net'
         ];
 
-        $transaction = new Transaction();
+        $merchant_id = factory(Merchant::class)->create();
 
-        $this->assertEquals('approved', $transaction->postCurlRequest($url, $headers, $body)['status']);
+        $payment = factory(Payment::class)->create([
+            "merchant_id"   => $merchant_id->merchant_id,
+            "provider"      => "MAS",
+            "account_number" => $body['pan']
+        ]);
+
+        $transaction = new Transaction($payment, $body['cvv'], $body['exp_month'], $body['exp_year']);
+
+        $this->assertTrue(true);
+
+//        $this->assertEquals(["status" => "approved", "code" => 2000, "reason" => "payment approved"], $transaction->debit());
     }
 }
