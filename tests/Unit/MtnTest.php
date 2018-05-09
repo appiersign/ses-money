@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use App\Merchant;
 use App\Mtn;
 use App\Payment;
+use App\Transaction;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -25,8 +26,8 @@ class MtnTest extends TestCase
             "merchant_id" => $merchant->merchant_id
         ]);
 
-        $mtn = new Mtn();
+        $transaction = new Transaction($payment);
 
-        $this->assertSame(2001, $mtn->debit($payment));
+        $this->assertEquals(["status" => "success", "code" => 2001, "reason" => "payment request sent"], $transaction->debit());
     }
 }

@@ -39,6 +39,9 @@ class Mtn extends Model
     public function debit(Payment $payment)
     {
         $this->payment = $payment;
+        $this->payment->authorization_code = '001101';
+        $this->payment->save();
+
         $expiry = new DateTime('tomorrow');
         $expiry = $expiry->format('Y-m-d');
         $params = array
@@ -73,6 +76,10 @@ class Mtn extends Model
             $response = $client->__soapCall('postInvoice', array($params));
             $response = get_object_vars($response);
             $response = get_object_vars($response['return']);
+
+            $this->payment->authorization_code = substr($this->payment->authorization_code, 0, 3). $response['responseCode'];
+            $this->payment->save();
+
             $this->responseCode = $response['responseCode'];
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
@@ -81,6 +88,30 @@ class Mtn extends Model
 
         return $this->getResponse();
 
+    }
+
+    public function credit($subscriberID, $amount, $transactionID)
+    {
+        $this->url = 'http://68.169.59.49:8080/vpova/services/vpovaservice?wsdl';
+        $params = array
+        (
+            'vendorID' => $this->vendorID,
+            'subscriberID' => $subscriberID,
+            'thirdpartyTransactionID' => $transactionID,
+            'amount' => $amount,
+            'apiKey' => $this->apiKey
+        );
+
+        $client = new SoapClient($this->url);
+        $response = $client->__soapCall('DepositToWallet', array($params));
+
+        $response = get_object_vars($response);
+        $response = $response['return'];
+        $response = get_object_vars($response);
+
+
+        $response = $response['responseCode'];
+        
     }
 
     public function getResponse()

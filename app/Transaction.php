@@ -63,7 +63,7 @@ class Transaction extends Model
                 $response = [
                     "status"    => "success",
                     "code"      => $this->response,
-                    "reason"    => "payment request sent successfully"
+                    "reason"    => "payment request sent"
                 ];
                 break;
 
