@@ -12,6 +12,7 @@ class Mtn extends Model
     private $response = [];
     private $responseCode;
     private $payment;
+    private $transfer;
 
     /**
      * Mtn constructor.
@@ -90,19 +91,20 @@ class Mtn extends Model
 
     }
 
-    public function credit($subscriberID, $amount, $transactionID)
+    public function credit(Transfer $transfer)
     {
+        $this->transfer = $transfer;
         $this->url = 'http://68.169.59.49:8080/vpova/services/vpovaservice?wsdl';
         $params = array
         (
             'vendorID' => $this->vendorID,
-            'subscriberID' => $subscriberID,
-            'thirdpartyTransactionID' => $transactionID,
-            'amount' => $amount,
+            'subscriberID' => $transfer->account_number,
+            'thirdpartyTransactionID' => $transfer->stan,
+            'amount' => (int) $transfer->amount / 100,
             'apiKey' => $this->apiKey
         );
 
-        $client = new SoapClient($this->url);
+        $client   = new SoapClient($this->url);
         $response = $client->__soapCall('DepositToWallet', array($params));
 
         $response = get_object_vars($response);
