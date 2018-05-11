@@ -4,6 +4,8 @@ namespace Tests\Unit;
 
 use App\Jobs\CreateMerchant;
 use App\Merchant;
+use App\User;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -54,4 +56,42 @@ class MerchantTest extends TestCase
         ]);
         $response->assertStatus(200);
     }
+
+    public function testResetMerchantPassword()
+    {
+        $user = factory(User::class)->create();
+        $merchant = factory(Merchant::class)->create();
+
+        Auth::onceUsingId($user->id);
+
+        $response = $this->actingAs($user)->get('merchants/'.$merchant->ses_money_id.'/password.reset');
+        $response->assertSeeText('password reset successful');
+    }
+
+    public function testToggleMerchantStatus()
+    {
+        $user = factory(User::class)->create();
+        $merchant = factory(Merchant::class)->create();
+
+        Auth::onceUsingId($user->id);
+
+        $response = $this->actingAs($user)->get('merchants/'.$merchant->ses_money_id.'/status.toggle');
+        $response->assertSeeText($merchant->name." status updated");
+    }
+
+    public function testUpdatePassword()
+    {
+        $user = factory(User::class)->create();
+
+        Auth::onceUsingId($user->id);
+
+        $response = $this->post('merchants/password.update', [
+            'old' => 'admin',
+            'password' => 'secret',
+            'password_confirmation' => 'admin'
+        ]);
+
+        $response->assertStatus(422);
+    }
 }
+
