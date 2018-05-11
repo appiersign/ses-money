@@ -9,6 +9,7 @@ class Payment extends Model
     protected $fillable = [
         'merchant_id',
         'stan',
+        'account_number',
         'transaction_id',
         'provider',
         'amount',

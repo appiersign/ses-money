@@ -41,12 +41,12 @@ class MakePaymentJob implements ShouldQueue
         $payment = Payment::create($this->request);
 
         if (in_array($this->request['provider'], ['MAS', 'VIS'])) {
-            $transaction = new Transaction($payment, $this->request['cvv'], $this->request['expiry_month'], $this->request['expiry_year']);
+            $transaction = new Transaction($this->request['cvv'], $this->request['expiry_month'], $this->request['expiry_year']);
         } else {
-            $transaction = new Transaction($payment);
+            $transaction = new Transaction();
         }
 
-        $transaction->debit();
+        $transaction->debit($payment);
 
         $this->response = [
             'status' => 'success',
