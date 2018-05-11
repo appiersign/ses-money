@@ -12,6 +12,7 @@ class Mtn extends Model
     private $response = [];
     private $responseCode;
     private $payment;
+    private $transfer;
 
     /**
      * Mtn constructor.
@@ -54,7 +55,7 @@ class Mtn extends Model
             'info' => $this->payment->description,
             'amt' => (int) $this->payment->amount / 100,
             'mobile' => '+233'.substr($this->payment->account_number, 1),
-            'billprompt' => 3,
+            'billprompt' => 2,
             'thirdpartyID' => $this->payment->stan
         );
 
@@ -90,27 +91,40 @@ class Mtn extends Model
 
     }
 
-    public function credit($subscriberID, $amount, $transactionID)
+    public function credit(Transfer $transfer)
     {
+        $this->transfer = $transfer;
+        $this->transfer->authorization_code = '001101';
+        $this->transfer->save();
+
         $this->url = 'http://68.169.59.49:8080/vpova/services/vpovaservice?wsdl';
         $params = array
         (
             'vendorID' => $this->vendorID,
-            'subscriberID' => $subscriberID,
-            'thirdpartyTransactionID' => $transactionID,
-            'amount' => $amount,
+            'subscriberID' => $transfer->account_number,
+            'thirdpartyTransactionID' => $transfer->stan,
+            'amount' => (int) $transfer->amount / 100,
             'apiKey' => $this->apiKey
         );
 
-        $client = new SoapClient($this->url);
-        $response = $client->__soapCall('DepositToWallet', array($params));
+        $client   = new SoapClient($this->url);
 
-        $response = get_object_vars($response);
-        $response = $response['return'];
-        $response = get_object_vars($response);
+        try {
+            $response = $client->__soapCall('DepositToWallet', array($params));
+
+            $response           = get_object_vars($response);
+            $this->response     = get_object_vars($response['return']);
+            $this->responseCode = $this->response['responseCode'];
+
+            $this->transfer->authorization_code = substr($this->transfer->authorization_code, 0, 3). $this->responseCode;
+            $this->transfer->save();
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+            $this->responseCode = 9000;
+        }
 
 
-        $response = $response['responseCode'];
+        return $this->getResponse();
 
     }
 
@@ -125,6 +139,21 @@ class Mtn extends Model
             case "13SY":
                 // no set up data found
                 $code = 9001;
+                break;
+
+            case "01":
+                // wallet credited
+                $code = 2002;
+                break;
+
+            case "527":
+                // non MOMO number
+                $code = 4001;
+                break;
+
+            case 9000:
+                // external error
+                $code = $this->responseCode;
                 break;
         }
 
