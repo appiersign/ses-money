@@ -22,6 +22,8 @@ Route::middleware('merchant')->group( function() {
     Route::get('', function (Request $request){
         return $request->all();
     });
+
+    Route::resource('payments', 'PaymentController');
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
