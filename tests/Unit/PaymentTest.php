@@ -40,10 +40,10 @@ class PaymentTest extends TestCase
             "account_number" => $body['pan']
         ]);
 
-        $transaction = new Transaction($payment, $body['cvv'], $body['exp_month'], $body['exp_year']);
+        $transaction = new Transaction($body['cvv'], $body['exp_month'], $body['exp_year']);
 
         $this->assertTrue(true);
 
-//        $this->assertEquals(["status" => "approved", "code" => 2000, "reason" => "payment approved"], $transaction->debit());
+//        $this->assertEquals(["status" => "approved", "code" => 2000, "reason" => "payment approved"], $transaction->debit($payment));
     }
 }

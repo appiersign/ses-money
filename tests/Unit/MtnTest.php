@@ -3,12 +3,10 @@
 namespace Tests\Unit;
 
 use App\Merchant;
-use App\Mtn;
 use App\Payment;
 use App\Transaction;
+use App\Transfer;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class MtnTest extends TestCase
 {
@@ -26,8 +24,21 @@ class MtnTest extends TestCase
             "merchant_id" => $merchant->merchant_id
         ]);
 
-        $transaction = new Transaction($payment);
+        $transaction = new Transaction();
 
-        $this->assertEquals(["status" => "success", "code" => 2001, "reason" => "payment request sent"], $transaction->debit());
+        $this->assertEquals(["status" => "success", "code" => 2000, "reason" => "payment request sent"], $transaction->debit($payment));
+    }
+
+    public function testCredit()
+    {
+        $merchant = factory(Merchant::class)->create();
+        $transfer = factory(Transfer::class)->create([
+            "provider" => "MTN",
+            "account_number" => "0249621938",
+            "merchant_id" => $merchant->merchant_id
+        ]);
+
+        $transaction = new Transaction();
+        $this->assertEquals(["status" => "success", "code" => 2000, "reason" => "transfer successful"], $transaction->credit($transfer));
     }
 }

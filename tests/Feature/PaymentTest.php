@@ -20,6 +20,7 @@ class PaymentTest extends TestCase
         $response = $this->postJson('api/payments', [
             'merchant_id' => $merchant->merchant_id,
             'transaction_id' => time().'00',
+            'account_number' => '024961938',
             'description' => 'testing from the other side',
             'amount' => '000000000010',
             'response_url' => 'https://qisimah.com',
