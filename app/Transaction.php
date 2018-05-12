@@ -15,7 +15,6 @@ class Transaction extends Model
 
     /**
      * Transaction constructor.
-     * @param Payment $payment
      * @param string|null $cvv
      * @param string|null $expiry_month
      * @param string $expiry_year
@@ -62,6 +61,7 @@ class Transaction extends Model
 
     private function getResponse()
     {
+        $response = [];
         switch ($this->response) {
             case 2000:
                 $response = [

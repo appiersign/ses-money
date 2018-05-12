@@ -30,6 +30,9 @@ class Mtn extends Model
     }
 
 
+    /**
+     * @return array
+     */
     public function getFunctions()
     {
         $client = new SoapClient($this->url);
@@ -37,6 +40,10 @@ class Mtn extends Model
         return $response;
     }
 
+    /**
+     * @param Payment $payment
+     * @return int
+     */
     public function debit(Payment $payment)
     {
         $this->payment = $payment;

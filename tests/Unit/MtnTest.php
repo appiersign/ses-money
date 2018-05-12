@@ -18,7 +18,7 @@ class MtnTest extends TestCase
     public function testDebit()
     {
         $merchant = factory(Merchant::class)->create();
-        $payment = factory(Payment::class)->create([
+        $payment  = factory(Payment::class)->create([
             "provider" => 'MTN',
             "account_number" => "0249621938",
             "merchant_id" => $merchant->merchant_id
