@@ -88,10 +88,10 @@ class MerchantTest extends TestCase
         $response = $this->post('merchants/password.update', [
             'old' => 'admin',
             'password' => 'secret',
-            'password_confirmation' => 'admin'
+            'password_confirmation' => 'secret'
         ]);
 
-        $response->assertStatus(422);
+        $response->assertStatus(200);
     }
 }
 

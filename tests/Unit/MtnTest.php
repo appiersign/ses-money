@@ -25,6 +25,7 @@ class MtnTest extends TestCase
         ]);
 
         $transaction = new Transaction();
+        $this->assertTrue(true);
 
         $this->assertEquals(["status" => "success", "code" => 2000, "reason" => "payment request sent"], $transaction->debit($payment));
     }
@@ -39,6 +40,7 @@ class MtnTest extends TestCase
         ]);
 
         $transaction = new Transaction();
+//        $this->assertTrue(true);
         $this->assertEquals(["status" => "success", "code" => 2000, "reason" => "transfer successful"], $transaction->credit($transfer));
     }
 }

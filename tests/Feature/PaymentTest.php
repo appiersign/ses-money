@@ -16,11 +16,12 @@ class PaymentTest extends TestCase
      */
     public function testMakePayment()
     {
+        $transaction_id = time().'00';
         $merchant = factory(Merchant::class)->create();
         $response = $this->postJson('api/payments', [
             'merchant_id' => $merchant->merchant_id,
-            'transaction_id' => time().'00',
-            'account_number' => '024961938',
+            'transaction_id' => $transaction_id,
+            'account_number' => '0556274000',
             'description' => 'testing from the other side',
             'amount' => '000000000010',
             'response_url' => 'https://qisimah.com',
@@ -30,12 +31,16 @@ class PaymentTest extends TestCase
         ]);
 
         $response->assertJson([
-            'merchant_id' => $merchant->merchant_id,
-            'transaction_id' => time().'00',
-            'description' => 'testing from the other side',
-            'amount' => '000000000010',
-            'response_url' => 'https://qisimah.com',
-            'provider' => 'MTN'
+            "merchant_id" => $merchant->merchant_id,
+            "transaction_id" => $transaction_id,
+            "description" => "testing from the other side",
+            "amount" => "000000000010",
+            "response_url" => "https://qisimah.com",
+            'account_number' => '0556274000',
+            "provider" => "MTN",
+            "status"    => "success",
+            "code"      => 2000,
+            "reason"    => "payment request sent"
         ]);
     }
 }
