@@ -95,9 +95,9 @@ class Mtn extends Model
         $params = array
         (
             'vendorID' => $this->vendorID,
-            'subscriberID' => $transfer->account_number,
-            'thirdpartyTransactionID' => $transfer->stan,
-            'amount' => (int) $transfer->amount / 100,
+            'subscriberID' => $this->transfer->account_number,
+            'thirdpartyTransactionID' => $this->transfer->stan,
+            'amount' => $this->transfer->getAmountAttribute(),
             'apiKey' => $this->apiKey
         );
 
@@ -109,6 +109,8 @@ class Mtn extends Model
             $response           = get_object_vars($response);
             $this->response     = get_object_vars($response['return']);
             $this->responseCode = $this->response['responseCode'];
+
+            Log::info($this->response['responseMessage']);
 
             $this->transfer->authorization_code = substr($this->transfer->authorization_code, 0, 3). $this->responseCode;
             $this->transfer->save();

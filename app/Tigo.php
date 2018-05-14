@@ -213,14 +213,11 @@ class Tigo extends Model
             $response = curl_exec( $curl );
 
             xml_parse_into_struct( xml_parser_create( ), $response, $array1, $array2 );
-            $response = $array1;
-            // Prepare and write the request data to our all.txt file
-
 
             if ( isset( $array1[ 10 ][ 'value' ] ) && $array1[ 10 ][ 'value' ] === "purchase-3008-0000-S" ){
                 $this->responseCode = 'purchase-3008-0000-S';
             } else {
-                $this->responseCode = $response[ 14 ][ 'value' ];
+                $this->responseCode = $array1[ 14 ][ 'value' ];
             }
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
