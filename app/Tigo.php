@@ -32,10 +32,13 @@ class Tigo extends Model
         $this->externalChannel = env('TGO_EXTERNAL_CHANNEL');
     }
 
-    function debit( $number, $amount, $serviceName, $transactionID  )
+    function debit( Payment $payment  )
     {
+        $this->payment = $payment;
+
         // $item is required and should be generated dynamically, it describes what the payment is for
         $this->url = "https://accessgw.tigo.com.gh:8443/live/PurchaseInitiate";
+
         $data = '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v1="http://xmlns.tigo.com/MFS/PurchaseInitiateRequest/V1" xmlns:v2="http://xmlns.tigo.com/ParameterType/V2" xmlns:v3="http://xmlns.tigo.com/RequestHeader/V3">
 			<SOAP-ENV:Header xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
 			<cor:debugFlag xmlns:cor="http://soa.mic.co.af/coredata_1">true</cor:debugFlag>
@@ -58,25 +61,27 @@ class Tigo extends Model
 			</v3:RequestHeader>
 			<v1:requestBody>
 			<v1:customerAccount>
-			<v1:msisdn>233'.substr($number, 1).'</v1:msisdn>
+			<v1:msisdn>233'.substr($this->payment->account_number, 1).'</v1:msisdn>
 			</v1:customerAccount>
 			<v1:initiatorAccount>
 			<v1:msisdn>233276203025</v1:msisdn>
 			</v1:initiatorAccount>
-			<v1:paymentReference>'.$transactionID.'</v1:paymentReference>
+			<v1:paymentReference>'.$this->payment->stan.'</v1:paymentReference>
 			<v1:externalCategory>'.$this->externalCategory.'</v1:externalCategory>
 			<v1:externalChannel>'.$this->externalChannel.'</v1:externalChannel>
 			<v1:webUser>'.$this->webUser.'</v1:webUser>
 			<v1:webPassword>'.$this->wPassword.'</v1:webPassword>
 			<v1:merchantName>TekPulse</v1:merchantName>
 			<v1:itemName>TekPulse</v1:itemName>
-			<v1:amount>'.$amount.'</v1:amount>
+			<v1:amount>'.$this->payment->getAmountAttribute().'</v1:amount>
 			<v1:minutesToExpire>2</v1:minutesToExpire>
 			<v1:notificationChannel>2</v1:notificationChannel>
 			</v1:requestBody>
 			</v1:PurchaseInitiateRequest>
 			</SOAP-ENV:Body>
 			</SOAP-ENV:Envelope>';
+
+
         $curl = curl_init();
         curl_setopt( $curl, CURLOPT_URL, $this->url );
         curl_setopt(
@@ -90,9 +95,9 @@ class Tigo extends Model
         curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
         curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, false );
         curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, 2 );
-        curl_setopt( $curl, CURLOPT_SSLCERT, '/etc/pki/tls/certs/ag_partner.crt.pem' );
+        curl_setopt( $curl, CURLOPT_SSLCERT, getcwd().'/key.pem' );
         curl_setopt( $curl, CURLOPT_SSLCERTTYPE, 'PEM' );
-        curl_setopt( $curl, CURLOPT_SSLKEY, '/etc/pki/tls/certs/ag_partner.key.pem' );
+//        curl_setopt( $curl, CURLOPT_SSLKEY, '/etc/pki/tls/certs/ag_partner.key.pem' );
         curl_setopt( $curl, CURLOPT_SSLCERTPASSWD, 'tigo123!' );
         curl_setopt( $curl, CURLOPT_SSLKEYPASSWD, 'tigo123!' );
 
@@ -120,8 +125,9 @@ class Tigo extends Model
         return $this->getResponseCode();
     }
 
-    public function credit( $tigoNumber, $amount, $transactionID )
+    public function credit( Transfer $transfer )
     {
+        $this->transfer = $transfer;
         $this->url = "https://accessgw.tigo.com.gh:8443/live/Purchase?wsdl";
         $data ='<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v2="http://xmlns.tigo.com/MFS/PurchaseRequest/V2" xmlns:v3="http://xmlns.tigo.com/RequestHeader/V3" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:v21="http://xmlns.tigo.com/ParameterType/V2">
 			<soapenv:Header  xmlns:cor="http://soa.mic.co.af/coredata_1">
@@ -139,9 +145,9 @@ class Tigo extends Model
 			<v3:GeneralConsumerInformation>
 			<v3:consumerID>'.$this->consumerID.'</v3:consumerID>
 			<!--Optional:-->
-			<v3:transactionID>'.$transactionID.'</v3:transactionID>
+			<v3:transactionID>'.$this->transfer->stan.'</v3:transactionID>
 			<v3:country>GHA</v3:country>
-			<v3:correlationID>'.$transactionID.'</v3:correlationID>
+			<v3:correlationID>'.$this->transfer->stan.'</v3:correlationID>
 			</v3:GeneralConsumerInformation>
 			</v3:RequestHeader>
 			<v2:requestBody>
@@ -152,10 +158,10 @@ class Tigo extends Model
 			<!--Optional:-->
 			<v2:targetWallet>
 			<!--You have a CHOICE of the next 2 items at this level-->
-			<v2:msisdn>233'.substr($tigoNumber, 1).'</v2:msisdn>
+			<v2:msisdn>'.$this->transfer->getAccountNumberAttribute().'</v2:msisdn>
 			</v2:targetWallet>
 			<v2:password>3025</v2:password>
-			<v2:amount>'.$amount.'</v2:amount>
+			<v2:amount>'.$this->transfer->getAmountAttribute().'</v2:amount>
 			<v2:internalSystem>Yes</v2:internalSystem>
 			<v2:additionalParameters>
 			<!--Zero or more repetitions:-->
@@ -197,9 +203,7 @@ class Tigo extends Model
         curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, 2 );
         curl_setopt( $curl, CURLOPT_SSLCERT, getcwd().'/key.pem' );
         curl_setopt( $curl, CURLOPT_SSLCERTTYPE, 'PEM' );
-//        curl_setopt( $curl, CURLOPT_SSLKEY, '/etc/pki/tls/certs/ag_partner.key.pem' );
         curl_setopt( $curl, CURLOPT_SSLCERTPASSWD, 'tigo123!' );
-//        curl_setopt( $curl, CURLOPT_SSLKEYPASSWD, 'tigo123!' );
 
         try {
             // Prepare and write the request data to our all.txt file
@@ -213,7 +217,7 @@ class Tigo extends Model
             // Prepare and write the request data to our all.txt file
 
 
-            if ( isset( $response[ 10 ][ 'value' ] ) && $response[ 10 ][ 'value' ] === "purchase-3008-0000-S" ){
+            if ( isset( $array1[ 10 ][ 'value' ] ) && $array1[ 10 ][ 'value' ] === "purchase-3008-0000-S" ){
                 $this->responseCode = 'purchase-3008-0000-S';
             } else {
                 $this->responseCode = $response[ 14 ][ 'value' ];
@@ -230,6 +234,10 @@ class Tigo extends Model
     {
         switch ( $this->responseCode )
         {
+            // payment request sent
+            case 'purchaseinitiate-3022-0001-S':
+                return 2001;
+                break;
             // successful transaction
             case 'purchase-3008-0000-S':
                 return 2000;
