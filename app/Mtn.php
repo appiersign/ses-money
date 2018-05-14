@@ -62,7 +62,7 @@ class Mtn extends Model
             'info' => $this->payment->description,
             'amt' => (int) $this->payment->amount / 100,
             'mobile' => '+233'.substr($this->payment->account_number, 1),
-            'billprompt' => 3,
+            'billprompt' => 2,
             'thirdpartyID' => $this->payment->stan
         );
 
