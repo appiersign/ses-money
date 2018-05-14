@@ -37,6 +37,12 @@ class Transaction extends Model
         } elseif ($this->payment->provider === 'MTN') {
             $mtn = new Mtn();
             $this->response = $mtn->debit($this->payment);
+        } elseif ($this->payment->provider === 'ATL') {
+            $airtel = new Airtel();
+            $this->response = $airtel->debit($this->payment);
+        } elseif ($this->payment->provider === 'TGO') {
+            $tigo = new Tigo();
+            $this->response = $tigo->debit($this->payment);
         }
         return $this->getResponse();
     }
@@ -52,6 +58,9 @@ class Transaction extends Model
         } elseif ($this->transfer->provider === 'ATL') {
             $airtel = new Airtel();
             $this->response = $airtel->credit($this->transfer);
+        } elseif ($this->transfer->provider === 'TGO') {
+            $tigo = new Tigo();
+            $this->response = $tigo->credit($transfer);
         }
 
         return $this->getResponse();
