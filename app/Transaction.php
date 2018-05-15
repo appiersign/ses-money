@@ -15,7 +15,6 @@ class Transaction extends Model
 
     /**
      * Transaction constructor.
-     * @param Payment $payment
      * @param string|null $cvv
      * @param string|null $expiry_month
      * @param string $expiry_year
@@ -38,6 +37,12 @@ class Transaction extends Model
         } elseif ($this->payment->provider === 'MTN') {
             $mtn = new Mtn();
             $this->response = $mtn->debit($this->payment);
+        } elseif ($this->payment->provider === 'ATL') {
+            $airtel = new Airtel();
+            $this->response = $airtel->debit($this->payment);
+        } elseif ($this->payment->provider === 'TGO') {
+            $tigo = new Tigo();
+            $this->response = $tigo->debit($this->payment);
         }
         return $this->getResponse();
     }
@@ -50,6 +55,12 @@ class Transaction extends Model
         if ($this->transfer->provider === "MTN") {
             $mtn = new Mtn();
             $this->response = $mtn->credit($this->transfer);
+        } elseif ($this->transfer->provider === 'ATL') {
+            $airtel = new Airtel();
+            $this->response = $airtel->credit($this->transfer);
+        } elseif ($this->transfer->provider === 'TGO') {
+            $tigo = new Tigo();
+            $this->response = $tigo->credit($transfer);
         }
 
         return $this->getResponse();
@@ -60,8 +71,12 @@ class Transaction extends Model
 //        check for the network and route accordingly
     }
 
-    private function getResponse()
+    /**
+     * @return array
+     */
+    private function getResponse(): array
     {
+        $response = [];
         switch ($this->response) {
             case 2000:
                 $response = [
@@ -87,11 +102,51 @@ class Transaction extends Model
                 ];
                 break;
 
+            case 4000:
+                $response = [
+                    "status"    => "failed",
+                    "code"      => $this->response,
+                    "reason"    => "number not registered for the service"
+                ];
+                break;
+
+            case 4001:
+                $response = [
+                    "status"    => "failed",
+                    "code"      => $this->response,
+                    "reason"    => "wrong authorization PIN"
+                ];
+                break;
+
+            case 4002:
+                $response = [
+                    "status"    => "failed",
+                    "code"      => $this->response,
+                    "reason"    => "transaction terminated or timed out"
+                ];
+                break;
+
+            case 4003:
+                $response = [
+                    "status"    => "failed",
+                    "code"      => $this->response,
+                    "reason"    => "insufficient funds"
+                ];
+                break;
+
             case 5000:
                 $response = [
                     "status"    => "error",
                     "code"      => $this->response,
                     "reason"    => "payment could not be processed"
+                ];
+                break;
+
+            case 5001:
+                $response = [
+                    "status"    => "failed",
+                    "code"      => $this->response,
+                    "reason"    => "network busy"
                 ];
                 break;
 

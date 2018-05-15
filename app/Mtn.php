@@ -30,6 +30,9 @@ class Mtn extends Model
     }
 
 
+    /**
+     * @return array
+     */
     public function getFunctions()
     {
         $client = new SoapClient($this->url);
@@ -37,6 +40,10 @@ class Mtn extends Model
         return $response;
     }
 
+    /**
+     * @param Payment $payment
+     * @return int
+     */
     public function debit(Payment $payment)
     {
         $this->payment = $payment;
@@ -47,30 +54,17 @@ class Mtn extends Model
         $expiry = $expiry->format('Y-m-d');
         $params = array
         (
-            'mesg' => "Payment Procedure\nDial *170#\nEnter 2 for Pay bill\nEnter 6 for general payment\nEnter {inv} as payment code\nEnter ".$this->payment->amount." as amount\nEnter MM PIN to authenticate\nEnter 1 to complete payment",
+            'mesg' => "Payment Procedure\nDial *170#\nEnter 2 for Pay bill\nEnter 6 for general payment\nEnter {inv} as payment code\nEnter ".((int) $this->payment->amount / 100)." as amount\nEnter MM PIN to authenticate\nEnter 1 to complete payment",
             'expiry' => $expiry,
             'username' => $this->username,
             'password' => $this->password,
-            'name' => 'PaySwitch Company Ltd.',
+            'name' => 'SES-Money',
             'info' => $this->payment->description,
             'amt' => (int) $this->payment->amount / 100,
             'mobile' => '+233'.substr($this->payment->account_number, 1),
             'billprompt' => 2,
             'thirdpartyID' => $this->payment->stan
         );
-
-//        $this->mtn_debit = new Mtn();
-//        $this->mtn_debit->username = self::masked($this->mtn_debit['username']);
-//        $this->mtn_debit->password = self::masked($this->mtn_debit['password']);
-//        $this->mtn_debit->mesg = 'Request to pay for bill is being processed. Your invoice number is {inv}.';
-//        $this->mtn_debit->expiry = $expiry;
-//        $this->mtn_debit->name = 'PaySwitch Company Ltd.';
-//        $this->mtn_debit->info = $serviceName;
-//        $this->mtn_debit->amt = $amt;
-//        $this->mtn_debit->mobile = $number;
-//        $this->mtn_debit->billprompt = '2';
-//        $this->mtn_debit->thirdpartyID = $thirdpartyID;
-//        $this->mtn_debit->save();
 
         $client = new SoapClient($this->url, $this->wsdl);
         try {
@@ -101,9 +95,9 @@ class Mtn extends Model
         $params = array
         (
             'vendorID' => $this->vendorID,
-            'subscriberID' => $transfer->account_number,
-            'thirdpartyTransactionID' => $transfer->stan,
-            'amount' => (int) $transfer->amount / 100,
+            'subscriberID' => $this->transfer->account_number,
+            'thirdpartyTransactionID' => $this->transfer->stan,
+            'amount' => $this->transfer->getAmountAttribute(),
             'apiKey' => $this->apiKey
         );
 
@@ -115,6 +109,8 @@ class Mtn extends Model
             $response           = get_object_vars($response);
             $this->response     = get_object_vars($response['return']);
             $this->responseCode = $this->response['responseCode'];
+
+            Log::info($this->response['responseMessage']);
 
             $this->transfer->authorization_code = substr($this->transfer->authorization_code, 0, 3). $this->responseCode;
             $this->transfer->save();

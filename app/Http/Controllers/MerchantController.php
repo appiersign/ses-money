@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateMerchant;
 use App\Merchant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class MerchantController extends Controller
@@ -32,7 +33,7 @@ class MerchantController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param CreateMerchant $request
      * @return \Illuminate\Http\Response
      */
     public function store(CreateMerchant $request)
@@ -50,8 +51,8 @@ class MerchantController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Merchant $merchant
+     * @return void
      */
     public function show(Merchant $merchant)
     {
@@ -106,40 +107,47 @@ class MerchantController extends Controller
         }
     }
 
-    public function resetPassword(Request $request)
+    public function resetPassword($ses_money_id)
     {
-        $merchant = Merchant::where('ses_money_id', $request->ses_money_id)->first();
-        if ($merchant <> null) {
-            $merchant->password = bcrypt('admin');
-            $merchant->save();
-            return 'password reset successful';
-        } else {
-            return 'merchant does not exist';
+        if (Auth::user()->role === 'admin') {
+            $merchant = Merchant::where('ses_money_id', $ses_money_id)->first();
+            if ($merchant <> null) {
+                $merchant->password = bcrypt('admin');
+                $merchant->save();
+                return 'password reset successful';
+            } else {
+                return 'merchant does not exist';
+            }
         }
+
+        return 'you are not allowed to perform this action';
     }
 
     public function updatePassword(Request $request)
     {
         $this->validate($request, [
             'old' => 'required|min:5|max:20',
-            'password' => 'required|min:5|max:20',
+            'password' => 'required|confirmed|min:5|max:20',
         ]);
     }
 
     public function toggleStatus($ses_money_id)
     {
-        $merchant = Merchant::where('ses_money_id', $ses_money_id)->first();
-        if ($merchant <> null) {
-            if ($merchant->is_active) {
-                $merchant->is_active = false;
-            } else {
-                $merchant->is_active = true;
-            }
+        if (Auth::user()->role === 'admin') {
+            $merchant = Merchant::where('ses_money_id', $ses_money_id)->first();
+            if ($merchant <> null) {
+                if ($merchant->is_active) {
+                    $merchant->is_active = false;
+                } else {
+                    $merchant->is_active = true;
+                }
 
-            $merchant->save();
-            return 'merchant status updated';
-        } else {
-            return 'status could not be updated';
+                $merchant->save();
+                return $merchant->name. " status updated";
+            } else {
+                return 'status could not be updated';
+            }
         }
+        return "you are not allowed to perform this action";
     }
 }

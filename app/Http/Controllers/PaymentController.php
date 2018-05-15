@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\MakePaymentRequest;
+use App\Http\Requests\CreatePaymentRequest;
+use App\Jobs\CreatePaymentJob;
 use App\Jobs\MakePaymentJob;
 use App\Payment;
 use Illuminate\Http\JsonResponse;
@@ -35,15 +36,16 @@ class PaymentController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param CreatePaymentRequest $request
+     * @return JsonResponse
      */
-    public function store(MakePaymentRequest $request): JsonResponse
+    public function store(CreatePaymentRequest $request): JsonResponse
     {
         try {
-            $job = new MakePaymentJob($request->all());
-            $this->dispatch($job);
-            return response()->json(array_merge($request->all(), $job->getMakePaymentResponse()), 201);
+            $createPaymentJob = new CreatePaymentJob($request->all());
+            $this->dispatch($createPaymentJob);
+            $payment = new Payment();
+            return response()->json(array_merge($request->all(), $payment->process($request)));
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
             return response()->json(array_merge($request->all(), [
