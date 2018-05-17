@@ -75,6 +75,7 @@ class Mtn extends Model
             $response = get_object_vars($response['return']);
 
             $this->payment->authorization_code = substr($this->payment->authorization_code, 0, 3). $response['responseCode'];
+            $this->payment->external_id = $response['invoiceNo'];
             $this->payment->save();
 
             $this->responseCode = $response['responseCode'];

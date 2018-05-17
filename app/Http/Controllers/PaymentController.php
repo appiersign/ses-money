@@ -101,4 +101,12 @@ class PaymentController extends Controller
     {
         //
     }
+
+    public function response($provider, Request $request)
+    {
+        $response = json_decode($request->getContent(), true);
+        $response['provider'] = $provider;
+        $payment = new Payment();
+        $payment->response($response);
+    }
 }
