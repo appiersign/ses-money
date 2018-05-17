@@ -13,6 +13,8 @@ class Mtn extends Model
     private $responseCode;
     private $payment;
     private $transfer;
+    private $username;
+    private $password;
 
     /**
      * Mtn constructor.
@@ -54,15 +56,15 @@ class Mtn extends Model
         $expiry = $expiry->format('Y-m-d');
         $params = array
         (
-            'mesg' => "Payment Procedure\nDial *170#\nEnter 2 for Pay bill\nEnter 6 for general payment\nEnter {inv} as payment code\nEnter ".((int) $this->payment->amount / 100)." as amount\nEnter MM PIN to authenticate\nEnter 1 to complete payment",
+            'mesg' => "Payment Procedure\nDial *170#\nEnter 2 for Pay bill\nEnter 6 for general payment\nEnter {inv} as payment code\nEnter ".($this->payment->getAmountAttribute())." as amount\nEnter MM PIN to authenticate\nEnter 1 to complete payment",
             'expiry' => $expiry,
             'username' => $this->username,
             'password' => $this->password,
-            'name' => 'SES-Money',
-            'info' => $this->payment->description,
-            'amt' => (int) $this->payment->amount / 100,
+            'name' => 'Tekpulse',
+            'info' => "Tekpulse",
+            'amt' => $this->payment->getAmountAttribute(),
             'mobile' => '+233'.substr($this->payment->account_number, 1),
-            'billprompt' => 2,
+            'billprompt' => '3',
             'thirdpartyID' => $this->payment->stan
         );
 
@@ -110,6 +112,8 @@ class Mtn extends Model
             $this->response     = get_object_vars($response['return']);
             $this->responseCode = $this->response['responseCode'];
 
+            Log::debug($response);
+
             Log::info($this->response['responseMessage']);
 
             $this->transfer->authorization_code = substr($this->transfer->authorization_code, 0, 3). $this->responseCode;
@@ -145,6 +149,11 @@ class Mtn extends Model
             case "527":
                 // non MOMO number
                 $code = 4001;
+                break;
+
+            case "682":
+                // External Server Error
+                $code = 5005;
                 break;
 
             case 9000:

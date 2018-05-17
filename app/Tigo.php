@@ -214,12 +214,12 @@ class Tigo extends Model
 
             xml_parse_into_struct( xml_parser_create( ), $response, $array1, $array2 );
 
-            Log::info(json_encode($array1));
-
             if ( isset( $array1[ 10 ][ 'value' ] ) && $array1[ 10 ][ 'value' ] === "purchase-3008-0000-S" ){
                 $this->responseCode = 'purchase-3008-0000-S';
-            } else {
+            } elseif (isset($array1[ 14 ][ 'value' ])) {
                 $this->responseCode = $array1[ 14 ][ 'value' ];
+            } elseif (isset($array1[5]['value']) && $array1[5]['value'] === 'Policy Falsified') {
+                $this->responseCode = 9000;
             }
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());

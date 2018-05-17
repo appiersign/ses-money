@@ -7,8 +7,10 @@ use App\Payment;
 use App\Transaction;
 use App\Transfer;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class MtnTest extends TestCase
+class AirtelTest extends TestCase
 {
     /**
      * A basic test example.
@@ -19,7 +21,7 @@ class MtnTest extends TestCase
     {
         $merchant = factory(Merchant::class)->create();
         $payment  = factory(Payment::class)->create([
-            "provider" => 'MTN',
+            "provider" => "ATL",
             "account_number" => "0249621938",
             "merchant_id" => $merchant->merchant_id
         ]);
@@ -33,7 +35,7 @@ class MtnTest extends TestCase
     {
         $merchant = factory(Merchant::class)->create();
         $transfer = factory(Transfer::class)->create([
-            "provider" => "MTN",
+            "provider" => "ATL",
             "account_number" => "0249621938",
             "merchant_id" => $merchant->merchant_id
         ]);
