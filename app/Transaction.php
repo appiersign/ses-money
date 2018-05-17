@@ -89,7 +89,7 @@ class Transaction extends Model
             case 2001:
                 $response = [
                     "status"    => "success",
-                    "code"      => 2000,
+                    "code"      => 2001,
                     "reason"    => "payment request sent"
                 ];
                 break;
@@ -147,6 +147,14 @@ class Transaction extends Model
                     "status"    => "failed",
                     "code"      => $this->response,
                     "reason"    => "network busy"
+                ];
+                break;
+
+            case 5005:
+                $response = [
+                    "status"    => "failed",
+                    "code"      => $this->response,
+                    "reason"    => "External server error"
                 ];
                 break;
 
