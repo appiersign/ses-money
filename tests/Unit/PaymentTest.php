@@ -66,6 +66,6 @@ class PaymentTest extends TestCase
         $response["responseCode"]   = "01";
         $response["external_id"]    = $payment->external_id;
 
-        $this->assertEquals(response()->json(["status" => "approved", "code" => 2000, "reason" => "transaction successful"]), $payment->response($response));
+        $this->assertEquals(json_encode(["status" => "approved", "code" => 2000, "reason" => "transaction successful"]), $payment->response($response));
     }
 }

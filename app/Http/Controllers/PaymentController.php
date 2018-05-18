@@ -108,9 +108,9 @@ class PaymentController extends Controller
         $response = [];
         $response['provider'] = $provider;
         if ($provider === 'mtn') {
-            $response['external_id'] = $_request['invoiceNo'];
+            $response['external_id']    = $_request['invoiceNo'];
             $response['transaction_id'] = $_request['transactionId'];
-            $response['response_code'] = $_request['responseCode'];
+            $response['response_code']  = $_request['responseCode'];
         }
         $payment = new Payment();
         $payment->response($response);
