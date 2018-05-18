@@ -26,6 +26,45 @@ class Transaction extends Model
         $this->card_details['expiry_year']  = $expiry_year;
     }
 
+    /**
+     * @param mixed $payment
+     */
+    public function setPayment($payment)
+    {
+        $this->payment = $payment;
+        $this->setType('payment');
+        return $this;
+    }
+
+    /**
+     * @param mixed $transfer
+     */
+    public function setTransfer($transfer)
+    {
+        $this->transfer = $transfer;
+        $this->setType('transfer');
+        return $this;
+    }
+
+    /**
+     * @param mixed $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @param mixed $response
+     */
+    public function setResponse($response)
+    {
+        $this->response = $response;
+        return $this;
+    }
+
+
+
     public function debit(Payment $payment)
     {
         $this->type     = "payment";
@@ -74,15 +113,15 @@ class Transaction extends Model
     /**
      * @return array
      */
-    private function getResponse(): array
+    public function getResponse(): array
     {
         $response = [];
         switch ($this->response) {
             case 2000:
                 $response = [
-                    "status"    => "success",
+                    "status"    => "approved",
                     "code"      => 2000,
-                    "reason"    => "payment successful"
+                    "reason"    => "transaction successful"
                 ];
                 break;
 

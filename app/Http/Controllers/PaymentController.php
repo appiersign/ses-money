@@ -104,8 +104,14 @@ class PaymentController extends Controller
 
     public function response($provider, Request $request)
     {
-        $response = json_decode($request->getContent(), true);
+        $_request = json_decode($request->getContent(), true);
+        $response = [];
         $response['provider'] = $provider;
+        if ($provider === 'mtn') {
+            $response['external_id'] = $_request['invoiceNo'];
+            $response['transaction_id'] = $_request['transactionId'];
+            $response['response_code'] = $_request['responseCode'];
+        }
         $payment = new Payment();
         $payment->response($response);
     }

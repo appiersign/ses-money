@@ -129,8 +129,11 @@ class Mtn extends Model
 
     }
 
-    public function getResponse()
+    public function getResponse($code = null)
     {
+        if ($code <> null) {
+            $this->responseCode = $code;
+        }
         switch ($this->responseCode) {
             case "0000":
                 // payment request sent
@@ -143,18 +146,23 @@ class Mtn extends Model
                 break;
 
             case "01":
-                // wallet credited
-                $code = 2002;
+                // transaction
+                $code = 2000;
                 break;
 
             case "527":
                 // non MOMO number
-                $code = 4001;
+                $code = 4003;
                 break;
 
             case "682":
                 // External Server Error
                 $code = 5005;
+                break;
+
+            case '515':
+                // Unregistered Mobile Number
+                return 4000;
                 break;
 
             case 9000:

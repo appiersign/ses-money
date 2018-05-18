@@ -6,7 +6,6 @@ use App\Merchant;
 use App\Payment;
 use App\Transaction;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PaymentTest extends TestCase
@@ -45,5 +44,28 @@ class PaymentTest extends TestCase
         $this->assertTrue(true);
 
 //        $this->assertEquals(["status" => "approved", "code" => 2000, "reason" => "payment approved"], $transaction->debit($payment));
+    }
+
+    public function testResponse(array $response = [])
+    {
+        $merchant_id    = factory(Merchant::class)->create();
+        $payment        = factory(Payment::class)->create([
+            "merchant_id"       => $merchant_id->merchant_id,
+            "provider"          => "mtn",
+            "account_number"    => "0249621938",
+            "response_url"      => "http://sesmoney.proxy.beeceptor.com",
+            "response_status"   => "success",
+            "response_code"     => 2001,
+            "response_message"  => "payment request sent",
+            "authorization_code" => "001101",
+            "external_id"       => str_random(12)
+        ]);
+
+        $response["provider"]       = "mtn";
+        $response["transaction_id"] = microtime();
+        $response["responseCode"]   = "01";
+        $response["external_id"]    = $payment->external_id;
+
+        $this->assertEquals(response()->json(["status" => "approved", "code" => 2000, "reason" => "transaction successful"]), $payment->response($response));
     }
 }
