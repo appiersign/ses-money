@@ -59,7 +59,6 @@ class Payment extends Model
 
     public function response($response)
     {
-        Log::debug($response);
         if ($response['provider'] === 'mtn') {
             $payment = Payment::where('external_id', $response['invoiceNo'])->first();
             $payment->reference_id = $response['transactionId'];
@@ -70,6 +69,8 @@ class Payment extends Model
                 $payment->response_message = 'payment successful';
             }
             $payment->save();
+
+            Transaction::postResponse($payment->transaction_id, $payment->response_status, $payment->response_code, $payment->response_message);
         }
     }
 }

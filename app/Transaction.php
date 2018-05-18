@@ -189,4 +189,19 @@ class Transaction extends Model
 
         return $response;
     }
+
+    public static function postResponse($transaction_id, $status, $code, $reason)
+    {
+        $curl = curl_init('http://sesmoney.proxy.beeceptor.com');
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode([
+            "transaction_id" => $transaction_id,
+            "status" => $status,
+            "code" => $code,
+            "reason" => $reason
+        ]));
+        curl_exec($curl);
+    }
 }
