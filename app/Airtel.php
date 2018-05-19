@@ -142,8 +142,9 @@ class Airtel extends Model
             $this->setResponse(curl_exec($curl));
             Log::debug($this->response);
             $this->responseCode = $this->response['resp_code'];
-            $this->transfer->authorization_code = '003'. $this->responseCode;
+            $this->transfer->authorization_code = '003'. $this->response['resp_code'];
             $this->transfer->external_id = $this->response['refid'];
+            $this->transfer->narration = $this->response['resp_desc'];
             $this->transfer->save();
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
