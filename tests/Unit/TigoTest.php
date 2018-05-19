@@ -21,7 +21,7 @@ class TigoTest extends TestCase
     {
         $merchant = factory(Merchant::class)->create();
         $payment = factory(Payment::class)->create([
-            'account_number' => '0577621938',
+            'account_number' => '0272994753',
             'provider' => 'TGO',
             'merchant_id' => $merchant->merchant_id
         ]);
@@ -34,7 +34,7 @@ class TigoTest extends TestCase
     {
         $merchant = factory(Merchant::class)->create();
         $transfer = factory(Transfer::class)->create([
-            'account_number' => '0577621938',
+            'account_number' => '0272994753',
             'provider' => 'TGO',
             'merchant_id' => $merchant->merchant_id
         ]);

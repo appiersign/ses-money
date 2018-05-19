@@ -106,11 +106,16 @@ class PaymentController extends Controller
     {
         $_request = json_decode($request->getContent(), true);
         $response = [];
+        Log::debug($_request);
         $response['provider'] = $provider;
         if ($provider === 'mtn') {
             $response['external_id']    = $_request['invoiceNo'];
             $response['transaction_id'] = $_request['transactionId'];
             $response['response_code']  = $_request['responseCode'];
+        } elseif ($provider === 'tigo') {
+            $response['external_id']    = $_request['correlation_id'];
+            $response['transaction_id'] = $_request['transaction_id'];
+            $response['response_code']  = $_request['code'];
         }
         $payment = new Payment();
         $payment->response($response);

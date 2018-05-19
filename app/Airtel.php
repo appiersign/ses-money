@@ -35,6 +35,12 @@ class Airtel extends Model
         $this->ts               = $date->format('Y-m-d H:i:s');
     }
 
+    public function setResponse($response)
+    {
+        $this->response = json_decode($response, 1);
+        return $this;
+    }
+
     public function debit(Payment $payment)
     {
         $this->payment = $payment;
@@ -80,8 +86,10 @@ class Airtel extends Model
         curl_setopt( $curl, CURLOPT_POSTREDIR, 3 );
 
         try {
-            $this->response = curl_exec($curl);
+            $this->setResponse(curl_exec($curl));
             $this->responseCode = $this->response['resp_code'];
+
+            Log::debug($this->response);
 
             $this->payment->authorization_code = '003' . $this->responseCode;
             $this->payment->save();
@@ -118,6 +126,7 @@ class Airtel extends Model
         $header = array(
             "Authorization: $auth"
         );
+
         $curl = curl_init();
         curl_setopt( $curl, CURLOPT_URL, $this->url );
         curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
@@ -130,9 +139,11 @@ class Airtel extends Model
         curl_setopt( $curl, CURLOPT_POSTFIELDS, $data );
 
         try {
-            $this->response = curl_exec($curl);
+            $this->setResponse(curl_exec($curl));
+            Log::debug($this->response);
             $this->responseCode = $this->response['resp_code'];
             $this->transfer->authorization_code = '003'. $this->responseCode;
+            $this->transfer->external_id = $this->response['refid'];
             $this->transfer->save();
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());

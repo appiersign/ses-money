@@ -57,7 +57,7 @@ class Payment extends Model
      * @param $response
      * @return \Illuminate\Http\JsonResponse
      */
-    public function response($response): JsonResponse
+    public function response(array $response): JsonResponse
     {
         $payment        = Payment::where('external_id', $response['external_id'])->first();
         $transaction    = new Transaction();
@@ -65,11 +65,11 @@ class Payment extends Model
 
         if ($response['provider'] === 'mtn') {
             $payment->reference_id = $response['transaction_id'];
-            $payment->authorization_code = substr($payment->authorization_code, 0, 3) . $response['responseCode'];
+            $payment->authorization_code = substr($payment->authorization_code, 0, 3) . $response['response_code'];
             $payment->save();
 
             $mtn = new Mtn();
-            $_response = $transaction->setResponse($mtn->getResponse($response['responseCode']))->getResponse();
+            $_response = $transaction->setResponse($mtn->getResponse($response['response_code']))->getResponse();
         }
 
         Transaction::postResponse($payment->transaction_id, $payment->response_status, $payment->response_code, $payment->response_message);
