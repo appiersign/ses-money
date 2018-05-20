@@ -113,10 +113,6 @@ class Mtn extends Model
             $this->response     = get_object_vars($response['return']);
             $this->responseCode = $this->response['responseCode'];
 
-            Log::debug($response);
-
-            Log::info($this->response['responseMessage']);
-
             $this->transfer->authorization_code = substr($this->transfer->authorization_code, 0, 3). $this->responseCode;
             $this->transfer->narration = $this->response['responseMessage'];
             $this->transfer->save();

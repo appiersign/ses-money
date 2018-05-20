@@ -42,7 +42,7 @@ class MerchantTest extends TestCase
 
     public function testUnauthorizedMerchantRequest()
     {
-        $response = $this->get('api/', [
+        $response = $this->get('v2.0/', [
             'Authorization' => 'Basic '.base64_encode('api_user:api_key')
         ]);
         $response->assertStatus(401);
@@ -51,7 +51,7 @@ class MerchantTest extends TestCase
     public function testAuthorizedMerchantRequest()
     {
         $merchant = Merchant::first();
-        $response = $this->postJson('api/debit', [], [
+        $response = $this->postJson('v2.0/debit', [], [
             'Authorization' => 'Basic '.base64_encode($merchant->api_user.':'.$merchant->api_key)
         ]);
         $response->assertStatus(200);

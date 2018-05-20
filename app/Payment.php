@@ -59,8 +59,6 @@ class Payment extends Model
      */
     public function response(array $response): JsonResponse
     {
-        Log::info('Message from Payment response method');
-        Log::debug($response);
         if ($response['provider'] === 'mtn') {
             $payment = Payment::where('external_id', $response['external_id'])->first();
         } elseif ($response['provider'] === 'airtel') {
@@ -90,7 +88,7 @@ class Payment extends Model
                 $_response = $transaction->setResponse($airtel->getResponse($response['response_code']))->getResponse();
             }
 
-            Transaction::postResponse($payment->transaction_id, $payment->response_status, $payment->response_code, $payment->response_message);
+            Transaction::postResponse($payment->response_url, $payment->transaction_id, $payment->response_status, $payment->response_code, $payment->response_message);
             return response()->json($_response);
         }
 

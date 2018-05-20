@@ -110,8 +110,6 @@ class Tigo extends Model
             // Prepare and write the request data to our messages_logs.txt file
             xml_parse_into_struct( xml_parser_create( ), $response, $array1, $array2 );
 
-            Log::debug($array1);
-
             if (isset($array1[ 10 ][ "value" ]) && $array1[ 10 ][ "value" ] === "purchaseinitiate-3022-0001-S"){
                 $this->responseCode = $array1[ 10 ][ "value" ];
             } elseif (isset($array1[ 14 ][ "value" ])) {

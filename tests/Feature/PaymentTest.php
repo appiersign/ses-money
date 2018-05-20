@@ -18,7 +18,7 @@ class PaymentTest extends TestCase
     {
         $transaction_id = time().'00';
         $merchant = factory(Merchant::class)->create();
-        $response = $this->postJson('api/payments', [
+        $response = $this->postJson('v2.0/payments', [
             'merchant_id' => $merchant->merchant_id,
             'transaction_id' => $transaction_id,
             'account_number' => '0556274000',

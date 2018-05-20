@@ -24,7 +24,7 @@ class TigoTest extends TestCase
             'account_number' => '0272994753',
             'provider' => 'TGO',
             'merchant_id' => $merchant->merchant_id,
-            "response_url" => "http://sesmoney.proxy.beeceptor.com"
+            "response_url" => "https://webhook.site/52b5e75e-cab4-4339-b0c1-9cea380e4ba6"
         ]);
 
         $tigo = new Tigo();
@@ -38,7 +38,7 @@ class TigoTest extends TestCase
             'account_number' => '0272994753',
             'provider' => 'TGO',
             'merchant_id' => $merchant->merchant_id,
-            "response_url" => "http://sesmoney.proxy.beeceptor.com"
+            "response_url" => "https://webhook.site/52b5e75e-cab4-4339-b0c1-9cea380e4ba6"
         ]);
 
         $tigo = new Tigo();

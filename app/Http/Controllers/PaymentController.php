@@ -106,7 +106,6 @@ class PaymentController extends Controller
     {
         $_request = json_decode($request->getContent(), true);
         $response = [];
-        Log::debug($_request);
         $response['provider'] = $provider;
         if ($provider === 'mtn') {
             $response['external_id']    = $_request['invoiceNo'];

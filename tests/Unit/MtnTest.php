@@ -22,7 +22,7 @@ class MtnTest extends TestCase
             "provider" => 'MTN',
             "account_number" => "0249621938",
             "merchant_id" => $merchant->merchant_id,
-            "response_url" => "http://sesmoney.proxy.beeceptor.com"
+            "response_url" => "https://webhook.site/52b5e75e-cab4-4339-b0c1-9cea380e4ba6"
         ]);
 
         $transaction = new Transaction();
@@ -37,7 +37,7 @@ class MtnTest extends TestCase
             "provider" => "MTN",
             "account_number" => "0249621938",
             "merchant_id" => $merchant->merchant_id,
-            "response_url" => "http://sesmoney.proxy.beeceptor.com"
+            "response_url" => "https://webhook.site/52b5e75e-cab4-4339-b0c1-9cea380e4ba6"
         ]);
 
         $transaction = new Transaction();
