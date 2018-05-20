@@ -57,22 +57,40 @@ class Payment extends Model
      * @param $response
      * @return \Illuminate\Http\JsonResponse
      */
-    public function response($response): JsonResponse
+    public function response(array $response): JsonResponse
     {
-        $payment        = Payment::where('external_id', $response['external_id'])->first();
-        $transaction    = new Transaction();
-        $transaction->setPayment($payment);
-
         if ($response['provider'] === 'mtn') {
-            $payment->reference_id = $response['transaction_id'];
-            $payment->authorization_code = substr($payment->authorization_code, 0, 3) . $response['responseCode'];
-            $payment->save();
-
-            $mtn = new Mtn();
-            $_response = $transaction->setResponse($mtn->getResponse($response['responseCode']))->getResponse();
+            $payment = Payment::where('external_id', $response['external_id'])->first();
+        } elseif ($response['provider'] === 'airtel') {
+            $payment = Payment::where('stan', $response['transaction_id'])->first();
         }
 
-        Transaction::postResponse($payment->transaction_id, $payment->response_status, $payment->response_code, $payment->response_message);
-        return response()->json($_response);
+
+        if (!is_null($payment)) {
+            $transaction    = new Transaction();
+            $transaction->setPayment($payment);
+
+            if ($response['provider'] === 'mtn') {
+                $payment->reference_id = $response['transaction_id'];
+                $payment->authorization_code = substr($payment->authorization_code, 0, 3) . $response['response_code'];
+                $payment->save();
+
+                $mtn = new Mtn();
+                $_response = $transaction->setResponse($mtn->getResponse($response['response_code']))->getResponse();
+            } elseif ($response['provider'] === 'airtel') {
+                $payment->reference_id  = $response['transaction_id'];
+                $payment->external_id   = $response['external_id'];
+                $payment->narration     = $response['narration'];
+                $payment->authorization_code = substr($payment->authorization_code, 0, 3) . $response['response_code'];
+                $payment->save();
+
+                $airtel = new Airtel();
+                $_response = $transaction->setResponse($airtel->getResponse($response['response_code']))->getResponse();
+            }
+
+            Transaction::postResponse($payment->response_url, $payment->transaction_id, $payment->response_status, $payment->response_code, $payment->response_message);
+            return response()->json($_response);
+        }
+
     }
 }

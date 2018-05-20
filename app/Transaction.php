@@ -189,6 +189,14 @@ class Transaction extends Model
                 ];
                 break;
 
+            case 5006:
+                $response = [
+                    "status"    => "error",
+                    "code"      => $this->response,
+                    "reason"    => "Transfer could be processed. Please try again later"
+                ];
+                break;
+
             case 5005:
                 $response = [
                     "status"    => "failed",
@@ -214,6 +222,8 @@ class Transaction extends Model
                 break;
         }
 
+        Log::debug($response);
+
         if ($this->type === "payment") {
             $this->payment->response_code       = $response['code'];
             $this->payment->response_status     = $response['status'];
@@ -229,9 +239,9 @@ class Transaction extends Model
         return $response;
     }
 
-    public static function postResponse($transaction_id, $status, $code, $reason)
+    public static function postResponse($url, $transaction_id, $status, $code, $reason)
     {
-        $curl = curl_init('http://sesmoney.proxy.beeceptor.com');
+        $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);

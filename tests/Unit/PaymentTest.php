@@ -28,7 +28,7 @@ class PaymentTest extends TestCase
             'exp_month'         => '10',
             'exp_year'          => '19',
             'cvv'               => '959',
-            '3d_url_response'   => 'https://api.theteller.net'
+            '3d_url_response'   => 'https://webhook.site/52b5e75e-cab4-4339-b0c1-9cea380e4ba6'
         ];
 
         $merchant_id = factory(Merchant::class)->create();
@@ -51,9 +51,9 @@ class PaymentTest extends TestCase
         $merchant_id    = factory(Merchant::class)->create();
         $payment        = factory(Payment::class)->create([
             "merchant_id"       => $merchant_id->merchant_id,
-            "provider"          => "mtn",
+            "provider"          => "MTN",
             "account_number"    => "0249621938",
-            "response_url"      => "http://sesmoney.proxy.beeceptor.com",
+            "response_url"      => "https://webhook.site/52b5e75e-cab4-4339-b0c1-9cea380e4ba6",
             "response_status"   => "success",
             "response_code"     => 2001,
             "response_message"  => "payment request sent",
@@ -63,9 +63,9 @@ class PaymentTest extends TestCase
 
         $response["provider"]       = "mtn";
         $response["transaction_id"] = microtime();
-        $response["responseCode"]   = "01";
+        $response["response_code"]   = "01";
         $response["external_id"]    = $payment->external_id;
 
-        $this->assertEquals(json_encode(["status" => "approved", "code" => 2000, "reason" => "transaction successful"]), $payment->response($response));
+        $this->assertEquals(response()->json(["status" => "approved", "code" => 2000, "reason" => "transaction successful"]), $payment->response($response));
     }
 }

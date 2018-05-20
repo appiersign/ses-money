@@ -54,9 +54,9 @@ class Tigo extends Model
 			<v3:RequestHeader>
 			<v3:GeneralConsumerInformation>
 			<v3:consumerID>'.$this->consumerID.'</v3:consumerID>
-			<v3:transactionID>Pay001</v3:transactionID>
+			<v3:transactionID>'.$this->payment->stan.'</v3:transactionID>
 			<v3:country>GHA</v3:country>
-			<v3:correlationID>Pay01</v3:correlationID>
+			<v3:correlationID>'.$this->payment->stan.'</v3:correlationID>
 			</v3:GeneralConsumerInformation>
 			</v3:RequestHeader>
 			<v1:requestBody>

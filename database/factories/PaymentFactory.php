@@ -9,6 +9,6 @@ $factory->define(App\Payment::class, function (Faker $faker) {
         "amount" => "000000000010",
         "account_number" => "0249621938",
         "description" => "testing from the tester",
-        "response_url" => "https://api.theteller.net"
+        "response_url" => "http://sesmoney.proxy.beeceptor.com"
     ];
 });

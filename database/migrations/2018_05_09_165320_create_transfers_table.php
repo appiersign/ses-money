@@ -24,6 +24,9 @@ class CreateTransfersTable extends Migration
             $table->string('description', 100);
             $table->string('response_url');
             $table->string('authorization_code')->nullable();
+            $table->string('external_id')->nullable();
+            $table->string('reference_id')->nullable();
+            $table->string('narration')->nullable();
             $table->string('response_code')->nullable();
             $table->string('response_status')->nullable();
             $table->string('response_message')->nullable();

@@ -111,6 +111,15 @@ class PaymentController extends Controller
             $response['external_id']    = $_request['invoiceNo'];
             $response['transaction_id'] = $_request['transactionId'];
             $response['response_code']  = $_request['responseCode'];
+        } elseif ($provider === 'tigo') {
+            $response['external_id']    = $_request['correlation_id'];
+            $response['transaction_id'] = $_request['transaction_id'];
+            $response['response_code']  = $_request['code'];
+        } elseif ($provider === 'airtel') {
+            $response['external_id']    = $_request['trans_id'];
+            $response['transaction_id'] = $_request['trans_ref'];
+            $response['response_code']  = $_request['trans_status'];
+            $response['narration']      = $_request['message'];
         }
         $payment = new Payment();
         $payment->response($response);

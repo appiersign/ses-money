@@ -22,8 +22,9 @@ class AirtelTest extends TestCase
         $merchant = factory(Merchant::class)->create();
         $payment  = factory(Payment::class)->create([
             "provider" => "ATL",
-            "account_number" => "0249621938",
-            "merchant_id" => $merchant->merchant_id
+            "account_number" => "0244676729",
+            "merchant_id" => $merchant->merchant_id,
+            "response_url" => "https://webhook.site/52b5e75e-cab4-4339-b0c1-9cea380e4ba6"
         ]);
 
         $transaction = new Transaction();
@@ -36,11 +37,12 @@ class AirtelTest extends TestCase
         $merchant = factory(Merchant::class)->create();
         $transfer = factory(Transfer::class)->create([
             "provider" => "ATL",
-            "account_number" => "0249621938",
-            "merchant_id" => $merchant->merchant_id
+            "account_number" => "0244676729",
+            "merchant_id" => $merchant->merchant_id,
+            "response_url" => "https://webhook.site/52b5e75e-cab4-4339-b0c1-9cea380e4ba6"
         ]);
 
         $transaction = new Transaction();
-        $this->assertEquals(["status" => "success", "code" => 2000, "reason" => "transfer successful"], $transaction->credit($transfer));
+        $this->assertEquals(["status" => "approved", "code" => 2000, "reason" => "transaction successful"], $transaction->credit($transfer));
     }
 }

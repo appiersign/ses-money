@@ -18,13 +18,13 @@ class PaymentTest extends TestCase
     {
         $transaction_id = time().'00';
         $merchant = factory(Merchant::class)->create();
-        $response = $this->postJson('api/payments', [
+        $response = $this->postJson('v2.0/payments', [
             'merchant_id' => $merchant->merchant_id,
             'transaction_id' => $transaction_id,
             'account_number' => '0556274000',
             'description' => 'testing from the other side',
             'amount' => '000000000010',
-            'response_url' => 'https://qisimah.com',
+            'response_url' => 'http://sesmoney.proxy.beeceptor.com',
             'provider' => 'MTN'
         ],[
             'Authorization' => 'Basic '.base64_encode("$merchant->api_user:$merchant->api_key")
@@ -35,11 +35,11 @@ class PaymentTest extends TestCase
             "transaction_id" => $transaction_id,
             "description" => "testing from the other side",
             "amount" => "000000000010",
-            "response_url" => "https://qisimah.com",
+            "response_url" => "http://sesmoney.proxy.beeceptor.com",
             'account_number' => '0556274000',
             "provider" => "MTN",
             "status"    => "success",
-            "code"      => 2000,
+            "code"      => 2001,
             "reason"    => "payment request sent"
         ]);
     }

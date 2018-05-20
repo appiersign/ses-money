@@ -35,6 +35,12 @@ class Airtel extends Model
         $this->ts               = $date->format('Y-m-d H:i:s');
     }
 
+    public function setResponse($response)
+    {
+        $this->response = json_decode($response, 1);
+        return $this;
+    }
+
     public function debit(Payment $payment)
     {
         $this->payment = $payment;
@@ -80,16 +86,16 @@ class Airtel extends Model
         curl_setopt( $curl, CURLOPT_POSTREDIR, 3 );
 
         try {
-            $this->response = curl_exec($curl);
+            $this->setResponse(curl_exec($curl));
             $this->responseCode = $this->response['resp_code'];
-
             $this->payment->authorization_code = '003' . $this->responseCode;
+            $this->payment->narration = $this->response['resp_desc'];
             $this->payment->save();
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
             $this->responseCode = 9000;
         }
-        return $this->getResponseCode();
+        return $this->getResponse();
     }
 
     public function credit(Transfer $transfer)
@@ -118,6 +124,7 @@ class Airtel extends Model
         $header = array(
             "Authorization: $auth"
         );
+
         $curl = curl_init();
         curl_setopt( $curl, CURLOPT_URL, $this->url );
         curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
@@ -130,24 +137,34 @@ class Airtel extends Model
         curl_setopt( $curl, CURLOPT_POSTFIELDS, $data );
 
         try {
-            $this->response = curl_exec($curl);
+            $this->setResponse(curl_exec($curl));
             $this->responseCode = $this->response['resp_code'];
-            $this->transfer->authorization_code = '003'. $this->responseCode;
+            $this->transfer->authorization_code = '003'. $this->response['resp_code'];
+            $this->transfer->external_id = $this->response['refid'];
+            $this->transfer->narration = $this->response['resp_desc'];
             $this->transfer->save();
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
             $this->responseCode = 9000;
         }
-        return $this->getResponseCode();
+        return $this->getResponse();
     }
 
-    private function getResponseCode()
+    public function getResponse($code = null)
     {
+        if ($code <> null) {
+            $this->responseCode = $code;
+        }
+
         switch ($this->responseCode)
         {
             // successful transaction
             case '200':
                 return 2000;
+                break;
+            // payment request sent
+            case '121':
+                return 2001;
                 break;
             // insufficient funds
             case '60019':
