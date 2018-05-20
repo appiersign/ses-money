@@ -88,16 +88,14 @@ class Airtel extends Model
         try {
             $this->setResponse(curl_exec($curl));
             $this->responseCode = $this->response['resp_code'];
-
-            Log::debug($this->response);
-
             $this->payment->authorization_code = '003' . $this->responseCode;
+            $this->payment->narration = $this->response['resp_desc'];
             $this->payment->save();
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
             $this->responseCode = 9000;
         }
-        return $this->getResponseCode();
+        return $this->getResponse();
     }
 
     public function credit(Transfer $transfer)
@@ -140,7 +138,6 @@ class Airtel extends Model
 
         try {
             $this->setResponse(curl_exec($curl));
-            Log::debug($this->response);
             $this->responseCode = $this->response['resp_code'];
             $this->transfer->authorization_code = '003'. $this->response['resp_code'];
             $this->transfer->external_id = $this->response['refid'];
@@ -150,16 +147,24 @@ class Airtel extends Model
             Log::error($exception->getMessage());
             $this->responseCode = 9000;
         }
-        return $this->getResponseCode();
+        return $this->getResponse();
     }
 
-    private function getResponseCode()
+    public function getResponse($code = null)
     {
+        if ($code <> null) {
+            $this->responseCode = $code;
+        }
+
         switch ($this->responseCode)
         {
             // successful transaction
             case '200':
                 return 2000;
+                break;
+            // payment request sent
+            case '121':
+                return 2001;
                 break;
             // insufficient funds
             case '60019':

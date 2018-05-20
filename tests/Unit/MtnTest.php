@@ -36,7 +36,8 @@ class MtnTest extends TestCase
         $transfer = factory(Transfer::class)->create([
             "provider" => "MTN",
             "account_number" => "0249621938",
-            "merchant_id" => $merchant->merchant_id
+            "merchant_id" => $merchant->merchant_id,
+            "response_url" => "http://sesmoney.proxy.beeceptor.com"
         ]);
 
         $transaction = new Transaction();

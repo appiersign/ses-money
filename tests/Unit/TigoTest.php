@@ -23,7 +23,8 @@ class TigoTest extends TestCase
         $payment = factory(Payment::class)->create([
             'account_number' => '0272994753',
             'provider' => 'TGO',
-            'merchant_id' => $merchant->merchant_id
+            'merchant_id' => $merchant->merchant_id,
+            "response_url" => "http://sesmoney.proxy.beeceptor.com"
         ]);
 
         $tigo = new Tigo();
@@ -36,7 +37,8 @@ class TigoTest extends TestCase
         $transfer = factory(Transfer::class)->create([
             'account_number' => '0272994753',
             'provider' => 'TGO',
-            'merchant_id' => $merchant->merchant_id
+            'merchant_id' => $merchant->merchant_id,
+            "response_url" => "http://sesmoney.proxy.beeceptor.com"
         ]);
 
         $tigo = new Tigo();

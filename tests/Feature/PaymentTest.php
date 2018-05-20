@@ -24,7 +24,7 @@ class PaymentTest extends TestCase
             'account_number' => '0556274000',
             'description' => 'testing from the other side',
             'amount' => '000000000010',
-            'response_url' => 'https://qisimah.com',
+            'response_url' => 'http://sesmoney.proxy.beeceptor.com',
             'provider' => 'MTN'
         ],[
             'Authorization' => 'Basic '.base64_encode("$merchant->api_user:$merchant->api_key")
@@ -35,11 +35,11 @@ class PaymentTest extends TestCase
             "transaction_id" => $transaction_id,
             "description" => "testing from the other side",
             "amount" => "000000000010",
-            "response_url" => "https://qisimah.com",
+            "response_url" => "http://sesmoney.proxy.beeceptor.com",
             'account_number' => '0556274000',
             "provider" => "MTN",
             "status"    => "success",
-            "code"      => 2000,
+            "code"      => 2001,
             "reason"    => "payment request sent"
         ]);
     }

@@ -8,6 +8,6 @@ $factory->define(App\Transfer::class, function (Faker $faker) {
         "transaction_id" => $faker->randomDigit,
         "amount" => "000000000010",
         "description" => "testing from the tester",
-        "response_url" => "https://api.theteller.net"
+        "response_url" => "http://sesmoney.proxy.beeceptor.com"
     ];
 });

@@ -189,6 +189,14 @@ class Transaction extends Model
                 ];
                 break;
 
+            case 5006:
+                $response = [
+                    "status"    => "error",
+                    "code"      => $this->response,
+                    "reason"    => "Transfer could be processed. Please try again later"
+                ];
+                break;
+
             case 5005:
                 $response = [
                     "status"    => "failed",
@@ -213,6 +221,8 @@ class Transaction extends Model
                 ];
                 break;
         }
+
+        Log::debug($response);
 
         if ($this->type === "payment") {
             $this->payment->response_code       = $response['code'];

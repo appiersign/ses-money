@@ -23,7 +23,8 @@ class AirtelTest extends TestCase
         $payment  = factory(Payment::class)->create([
             "provider" => "ATL",
             "account_number" => "0244676729",
-            "merchant_id" => $merchant->merchant_id
+            "merchant_id" => $merchant->merchant_id,
+            "response_url" => "http://sesmoney.proxy.beeceptor.com"
         ]);
 
         $transaction = new Transaction();
@@ -37,7 +38,8 @@ class AirtelTest extends TestCase
         $transfer = factory(Transfer::class)->create([
             "provider" => "ATL",
             "account_number" => "0244676729",
-            "merchant_id" => $merchant->merchant_id
+            "merchant_id" => $merchant->merchant_id,
+            "response_url" => "http://sesmoney.proxy.beeceptor.com"
         ]);
 
         $transaction = new Transaction();

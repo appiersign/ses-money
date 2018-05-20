@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'SES-Money'),
 
     /*
     |--------------------------------------------------------------------------
@@ -124,6 +124,8 @@ return [
     'log' => env('APP_LOG', 'single'),
 
     'log_level' => env('APP_LOG_LEVEL', 'debug'),
+
+    'log_max_files' => env('APP_LOG_MAX_FILES', 30),
 
     /*
     |--------------------------------------------------------------------------

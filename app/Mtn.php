@@ -118,6 +118,7 @@ class Mtn extends Model
             Log::info($this->response['responseMessage']);
 
             $this->transfer->authorization_code = substr($this->transfer->authorization_code, 0, 3). $this->responseCode;
+            $this->transfer->narration = $this->response['responseMessage'];
             $this->transfer->save();
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
@@ -163,6 +164,11 @@ class Mtn extends Model
             case '515':
                 // Unregistered Mobile Number
                 return 4000;
+                break;
+
+            case '04':
+                // Insufficient Funds in Merchant Wallet
+                return 5006;
                 break;
 
             case 9000:
