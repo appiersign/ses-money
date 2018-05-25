@@ -99,4 +99,9 @@ class Merchant extends Model
     {
         return $this->route;
     }
+
+    public function terminals()
+    {
+        return $this->hasMany(Terminal::class);
+    }
 }

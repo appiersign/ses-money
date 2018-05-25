@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Terminals extends Model
+class Terminal extends Model
 {
     protected $fillable = ['name', 'type' ,'merchant_id', 'ses_money_id', 'pin'];
 

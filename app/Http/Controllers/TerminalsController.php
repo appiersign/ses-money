@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Terminals;
+use App\Terminal;
 use Illuminate\Http\Request;
 
 class TerminalsController extends Controller
@@ -41,10 +41,10 @@ class TerminalsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Terminals  $terminals
+     * @param  \App\Terminal  $terminals
      * @return \Illuminate\Http\Response
      */
-    public function show(Terminals $terminals)
+    public function show(Terminal $terminals)
     {
         //
     }
@@ -52,10 +52,10 @@ class TerminalsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Terminals  $terminals
+     * @param  \App\Terminal  $terminals
      * @return \Illuminate\Http\Response
      */
-    public function edit(Terminals $terminals)
+    public function edit(Terminal $terminals)
     {
         //
     }
@@ -64,10 +64,10 @@ class TerminalsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Terminals  $terminals
+     * @param  \App\Terminal  $terminals
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Terminals $terminals)
+    public function update(Request $request, Terminal $terminals)
     {
         //
     }
@@ -75,10 +75,10 @@ class TerminalsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Terminals  $terminals
+     * @param  \App\Terminal  $terminals
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Terminals $terminals)
+    public function destroy(Terminal $terminals)
     {
         //
     }
