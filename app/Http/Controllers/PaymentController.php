@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('merchant');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -39,8 +44,9 @@ class PaymentController extends Controller
      * @param CreatePaymentRequest $request
      * @return JsonResponse
      */
-    public function store(CreatePaymentRequest $request): JsonResponse
+    public function store(CreatePaymentRequest $request)
     {
+        $request->validated();
         try {
             $createPaymentJob = new CreatePaymentJob($request->all());
             $this->dispatch($createPaymentJob);
