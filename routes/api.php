@@ -9,6 +9,6 @@ Route::middleware('merchant')->group( function() {
 
 Route::post('payments/response/{provider}', 'PaymentController@response')->name('payments.response');
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+//Route::middleware('auth:api')->get('/user', function (Request $request) {
+//    return $request->user();
+//});
