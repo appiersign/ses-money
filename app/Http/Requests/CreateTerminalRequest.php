@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Merchant;
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateMerchant extends FormRequest
+class CreateTerminalRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +25,7 @@ class CreateMerchant extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|min:2|unique:merchants',
-            'email' => 'required|email|unique:merchants',
-            'telephone' => 'required|numeric|size:12',
+            'merchant_id' => 'required|exits:merchants',
         ];
     }
 }

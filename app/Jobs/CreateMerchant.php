@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Merchant;
+use App\Terminal;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 class CreateMerchant implements ShouldQueue
@@ -35,6 +36,9 @@ class CreateMerchant implements ShouldQueue
         if ($merchant <> null) {
             $merchant->merchant_id = 'SES-'.str_pad($merchant->id, 8, 0, STR_PAD_LEFT);
             $merchant->save();
+
+            $terminal = new Terminal();
+            $terminal->register(['merchant_id' => $merchant->id, 'name' => $merchant->name]);
         }
     }
 }
