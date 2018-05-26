@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Terminal;
 use Illuminate\Http\Request;
 
-class TerminalsController extends Controller
+class TerminalController extends Controller
 {
     /**
      * Display a listing of the resource.

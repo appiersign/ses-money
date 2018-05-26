@@ -4,6 +4,8 @@ namespace App;
 
 use App\Jobs\CreateMerchant;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 class Merchant extends Model
 {
@@ -100,8 +102,28 @@ class Merchant extends Model
         return $this->route;
     }
 
-    public function terminals()
+    /**
+     * @return HasMany
+     */
+    public function terminals(): HasMany
     {
         return $this->hasMany(Terminal::class);
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    public function getTerminalIds(): Collection
+    {
+        return $this->terminals()->pluck('ses_money_id');
+    }
+
+    /**
+     * @param string $terminal_id
+     * @return bool
+     */
+    public function hasTerminal(string $terminal_id): bool
+    {
+        return $this->getTerminalIds()->search($terminal_id);
     }
 }
