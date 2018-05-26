@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Merchant;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateTerminalRequest extends FormRequest
@@ -13,7 +14,7 @@ class CreateTerminalRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +25,7 @@ class CreateTerminalRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'merchant_id' => 'required|exits:merchants',
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateTerminalRequest;
 use App\Terminal;
 use Illuminate\Http\Request;
 
@@ -20,11 +21,18 @@ class TerminalController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param CreateTerminalRequest $request
+     * @return void
      */
-    public function create()
+    public function create(CreateTerminalRequest $request)
     {
-        //
+        $terminal = Terminal::create([
+            'merchant_id' => $request->input('merchant_id'),
+            'name'  => $request->input('name', null),
+            'type'  => $request->input('type', null)
+        ]);
+
+        $terminal->update(['']);
     }
 
     /**
