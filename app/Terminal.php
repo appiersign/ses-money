@@ -17,8 +17,7 @@ class Terminal extends Model
 
     public function register(array $data)
     {
-        $terminal = new Terminal();
-        $terminal->save($data);
+        $terminal = Terminal::create($data);
         $terminal->setSesMoneyIdAttribute($terminal->id);
         $terminal->save();
         return $terminal;
