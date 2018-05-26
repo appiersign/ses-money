@@ -124,6 +124,6 @@ class Merchant extends Model
      */
     public function hasTerminal(string $terminal_id): bool
     {
-        return $this->getTerminalIds()->search($terminal_id);
+        return in_array($terminal_id, $this->getTerminalIds()->toArray());
     }
 }

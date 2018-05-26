@@ -7,3 +7,7 @@ function failedValidationResponse($errors){
     }
     return $response;
 }
+
+function merchantIdValidated(\App\Merchant $merchant, $merchant_id){
+    return $merchant->ses_money_id === $merchant_id;
+}

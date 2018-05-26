@@ -46,7 +46,6 @@ class PaymentController extends Controller
      */
     public function store(CreatePaymentRequest $request)
     {
-        $request->validated();
         try {
             $createPaymentJob = new CreatePaymentJob($request->all());
             $this->dispatch($createPaymentJob);
