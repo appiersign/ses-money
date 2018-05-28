@@ -15,7 +15,7 @@ class PaymentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('merchant');
+        $this->middleware('merchant')->except('response');
     }
 
     /**

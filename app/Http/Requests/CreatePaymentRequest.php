@@ -36,7 +36,10 @@ class CreatePaymentRequest extends FormRequest
             'amount'            => 'bail|required|digits:12',
             'description'       => 'bail|required|min:6|max:100',
             'response_url'      => 'bail|required|url',
-            'provider'          => 'bail|required|size:3|in:MTN,TGO,ATL,VDF,VIS,MAS'
+            'provider'          => 'bail|required|size:3|in:MTN,TGO,ATL,VDF,VIS,MAS',
+            'cvv'               => 'bail|required_if:provider,MAS,VIS',
+            'expiry_month'      => 'bail|required_if:provider,MAS,VIS',
+            'expiry_year'       => 'bail|required_if:provider,MAS,VIS'
         ];
     }
 
