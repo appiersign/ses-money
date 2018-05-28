@@ -21,13 +21,14 @@ class Transaction extends Model
      */
     public function __construct(string $cvv = null, string $expiry_month = null, string  $expiry_year = null)
     {
-        $this->card_details['cvv']          = $cvv;
-        $this->card_details['expiry_month'] = $expiry_month;
-        $this->card_details['expiry_year']  = $expiry_year;
+        $this->card_details['cvv']       = $cvv;
+        $this->card_details['exp_month'] = $expiry_month;
+        $this->card_details['exp_year']  = $expiry_year;
     }
 
     /**
      * @param mixed $payment
+     * @return Transaction
      */
     public function setPayment($payment)
     {
@@ -38,6 +39,7 @@ class Transaction extends Model
 
     /**
      * @param mixed $transfer
+     * @return Transaction
      */
     public function setTransfer($transfer)
     {
@@ -56,6 +58,7 @@ class Transaction extends Model
 
     /**
      * @param mixed $response
+     * @return Transaction
      */
     public function setResponse($response)
     {
@@ -221,8 +224,6 @@ class Transaction extends Model
                 ];
                 break;
         }
-
-        Log::debug($response);
 
         if ($this->type === "payment") {
             $this->payment->response_code       = $response['code'];

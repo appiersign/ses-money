@@ -15,7 +15,7 @@ class PaymentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('merchant');
+        $this->middleware('merchant')->except('response');
     }
 
     /**
@@ -46,7 +46,6 @@ class PaymentController extends Controller
      */
     public function store(CreatePaymentRequest $request)
     {
-        $request->validated();
         try {
             $createPaymentJob = new CreatePaymentJob($request->all());
             $this->dispatch($createPaymentJob);

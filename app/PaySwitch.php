@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class PaySwitch extends Model
 {
@@ -29,15 +30,15 @@ class PaySwitch extends Model
         ];
 
         $body = [
-            'merchant_id'       => 'TTM-00000001',
+            'merchant_id'       => 'TTM-00000004',
             'transaction_id'    => $this->payment->stan,
-            'desc'              => $this->payment->description,
-            'amount'            => $this->payment->amount,
+            'desc'              => $this->payment->merchant_id . ' ' .$this->payment->provider . ' PAYMENT',
+            'amount'            => amountToMinor($this->payment->getAmountAttribute()),
             'r-switch'          => $this->payment->provider,
             'pan'               => $this->payment->account_number,
             'processing_code'   => '000000',
-            'exp_month'         => $this->request['expiry_month'],
-            'exp_year'          => $this->request['expiry_year'],
+            'exp_month'         => $this->request['exp_month'],
+            'exp_year'          => $this->request['exp_year'],
             'cvv'               => $this->request['cvv'],
             '3d_url_response'   => 'https://api.theteller.net'
         ];
@@ -72,6 +73,7 @@ class PaySwitch extends Model
     public function getResponseCode()
     {
         $this->payment->authorization_code = substr($this->payment->authorization_code, 0, 3). $this->response['code'];
+        $this->payment->narration = $this->response['reason'] ?? $this->response['description'];
         $this->payment->save();
 
         switch ($this->response['code']) {
