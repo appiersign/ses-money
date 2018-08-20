@@ -23,6 +23,8 @@ class CreateMerchant implements ShouldQueue
         $this->merchant['api_user'] = str_random();
         $this->merchant['merchant_id'] = 'pending';
         $this->merchant['address'] = $data['address'] ?? 'address';
+        $this->merchant['phone_number'] = $data['telephone'];
+        $this->merchant['password'] = bcrypt('admin');
     }
 
     /**
