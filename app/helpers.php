@@ -22,3 +22,14 @@ function amountToMinor($amount): string
     $string = ((float) $amount) * 100;
     return str_pad($string, 12, '0', STR_PAD_LEFT);
 }
+
+function sum_amount(array $transactions)
+{
+    $sum = 0.00;
+    foreach ($transactions as $transaction) {
+        if ($transaction['response_status'] === 'approved'){
+            $sum += (float) $transaction['amount'];
+        }
+    }
+    return $sum;
+}

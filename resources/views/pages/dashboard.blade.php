@@ -9,9 +9,9 @@
                         <div class="layer w-100 mB-10"><h6 class="lh-1">Total Transactions</h6></div>
                         <div class="layer w-100">
                             <div class="peers ai-sb fxw-nw">
-                                <div class="peer peer-greed"><h5 id="">123</h5></div>
+                                <div class="peer peer-greed"><h5 id="">{{ $payments->count() + $transfers->count() }}</h5></div>
                                 <div class="peer"><span
-                                            class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-green-50 c-green-500">GHS 10.00</span>
+                                            class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-green-50 c-green-500">GHS {{ $total }}</span>
                                 </div>
                             </div>
                         </div>
@@ -22,9 +22,9 @@
                         <div class="layer w-100 mB-10"><h6 class="lh-1">Debits</h6></div>
                         <div class="layer w-100">
                             <div class="peers ai-sb fxw-nw">
-                                <div class="peer peer-greed"><h4>456</h4></div>
+                                <div class="peer peer-greed"><h4>{{ $transfers->count() }}</h4></div>
                                 <div class="peer"><span
-                                            class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500">GHS 15.00</span>
+                                            class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500">GHS {{ $transfer_sum }}</span>
                                 </div>
                             </div>
                         </div>
@@ -35,9 +35,9 @@
                         <div class="layer w-100 mB-10"><h6 class="lh-1">Credits</h6></div>
                         <div class="layer w-100">
                             <div class="peers ai-sb fxw-nw">
-                                <div class="peer peer-greed"><h4>789</h4></div>
+                                <div class="peer peer-greed"><h4>{{ $payments->count() }}</h4></div>
                                 <div class="peer"><span
-                                            class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-purple-50 c-purple-500">GHS 20.00</span>
+                                            class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-purple-50 c-purple-500">GHS {{ $payment_sum }}</span>
                                 </div>
                             </div>
                         </div>
@@ -48,9 +48,9 @@
                         <div class="layer w-100 mB-10"><h6 class="lh-1">Balance</h6></div>
                         <div class="layer w-100">
                             <div class="peers ai-sb fxw-nw">
-                                <div class="peer peer-greed"><h4>321</h4></div>
+                                <div class="peer peer-greed"><h4>+</h4></div>
                                 <div class="peer"><span
-                                            class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-blue-50 c-blue-500">GHS 25.00</span>
+                                            class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-blue-50 c-blue-500">GHS 00.00</span>
                                 </div>
                             </div>
                         </div>
@@ -64,37 +64,56 @@
                 <table class="table table-bordered table-striped">
                     <thead>
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">First Name</th>
-                        <th scope="col">Last Name</th>
-                        <th scope="col">Username</th>
+                        <th scope="col">Merchant ID</th>
+                        <th scope="col">Transaction ID</th>
+                        <th scope="col">Account Number</th>
+                        <th scope="col">Provider</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Status</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@TwBootstrap</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">4</th>
-                        <td>Larry the Bird</td>
-                        <td>Larry the Bird</td>
-                        <td>@twitter</td>
-                    </tr>
+                    @if ($payments)
+                        @foreach ($payments as $payment)
+                            <tr>
+                                <th scope="row">{{ $payment->merchant_id }}</th>
+                                <td>{{ $payment->transaction_id }}</td>
+                                <td>{{ $payment->account_number }}</td>
+                                <td>{{ $payment->provider }}</td>
+                                <td>{{ $payment->amount }}</td>
+                                <td>
+                                    @if ($payment->response_status == 'approved')
+                                        <span class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-green-50 c-green-500">approved</span>
+                                        @elseif($payment->response_status == 'pending')
+                                        <span class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-blue-500">pending</span>
+                                        @else
+                                        <span class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500">failed</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    @endif
+
+                    @if ($transfers)
+                        @foreach ($transfers as $transfer)
+                            <tr>
+                                <th scope="row">{{ $transfer->merchant_id }}</th>
+                                <td>{{ $transfer->transaction_id }}</td>
+                                <td>{{ $transfer->account_number }}</td>
+                                <td>{{ $transfer->provider }}</td>
+                                <td>{{ $transfer->amount }}</td>
+                                <td>
+                                    @if ($transfer->response_status == 'approved')
+                                        <span class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-green-50 c-green-500">approved</span>
+                                    @elseif($transfer->response_status == 'pending')
+                                        <span class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-blue-500">pending</span>
+                                    @else
+                                        <span class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500">failed</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    @endif
                     </tbody>
                 </table>
             </div>

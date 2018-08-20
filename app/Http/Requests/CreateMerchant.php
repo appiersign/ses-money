@@ -26,7 +26,7 @@ class CreateMerchant extends FormRequest
         return [
             'name' => 'required|min:2|unique:merchants',
             'email' => 'required|email|unique:merchants',
-            'telephone' => 'required|numeric|size:12',
+            'telephone' => 'required|digits:12',
         ];
     }
 }

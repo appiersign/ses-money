@@ -4,7 +4,12 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::get('/', function () {
-    return view('pages.dashboard');
+    $payments = \App\Payment::latest('created_at')->get();
+    $transfers = \App\Transfer::latest('created_at')->get();
+    $payment_sum = sum_amount($payments->toArray());
+    $transfer_sum = sum_amount($transfers->toArray());
+    $total = $payment_sum + $transfer_sum;
+    return view('pages.dashboard', compact('payments', 'payment_sum', 'transfers', 'transfer_sum', 'total'));
 });
 
 Route::get('/home', 'HomeController@index')->name('home');

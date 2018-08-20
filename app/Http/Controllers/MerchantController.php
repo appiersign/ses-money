@@ -17,7 +17,8 @@ class MerchantController extends Controller
      */
     public function index()
     {
-        //
+        $merchants = Merchant::paginate(10);
+        return view('pages.merchant.index', compact('merchants'));
     }
 
     /**
@@ -27,7 +28,7 @@ class MerchantController extends Controller
      */
     public function create()
     {
-        return 'Merchant Registration';
+        return view('pages.merchant.create');
     }
 
     /**
@@ -41,70 +42,104 @@ class MerchantController extends Controller
         try {
             $job = new \App\Jobs\CreateMerchant($request->all());
             $this->dispatch($job);
-            return Merchant::latest('created_at')->first();
+            session()->flash('success', 'Merchant created!');
+            return redirect()->route('merchants.index');
         } catch (\Exception $exception) {
-            Log::error($exception->getMessage());
-
+            logger($exception->getMessage());
+            session()->flash('error', 'We failed trying to create merchant, please try again later!');
+            return redirect()->back();
         }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param Merchant $merchant
-     * @return void
+     * @param string $ses_money_id
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function show(Merchant $merchant)
+    public function show(string $ses_money_id)
     {
-        //
+        $merchant = Merchant::where('ses_money_id', $ses_money_id)->first();
+        if ($merchant) {
+
+        }
+        return $this->fake();
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param string $ses_money_id
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function edit(Merchant $merchant)
+    public function edit(string $ses_money_id)
     {
-        //
+        $merchant = Merchant::where('ses_money_id', $ses_money_id)->first();
+        if ($merchant){
+            return view('pages.merchant.edit', compact('merchant'));
+        }
+        return $this->fake();
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param string $ses_money_id
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(CreateMerchant $request, Merchant $merchant)
+    public function update(Request $request, string $ses_money_id)
     {
-        $merchant->setEmailAttribute($request->input('email', $merchant->getEmailAttribute()));
-        $merchant->setNameAttribute($request->input('name', $merchant->getNameAttribute()));
-        $merchant->setAddressAttribute($request->input('address', $merchant->getAddressAttribute()));
-        $merchant->setPhoneNumberAttribute($request->input('phone_number', $merchant->getPhoneNumberAttribute()));
+        $merchant = Merchant::where('ses_money_id', $ses_money_id)->first();
+        if ($merchant) {
+            $merchant->setEmailAttribute($request->input('email', $merchant->getEmailAttribute()));
+            $merchant->setNameAttribute($request->input('name', $merchant->getNameAttribute()));
+            $merchant->setAddressAttribute($request->input('address', $merchant->getAddressAttribute()));
+            $merchant->setPhoneNumberAttribute($request->input('phone_number', $merchant->getPhoneNumberAttribute()));
 
-        try {
-            $merchant->save();
-        } catch (\Exception $exception) {
-            Log::error($exception->getMessage());
+            try {
+                $merchant->save();
+                session()->flash('success', 'Merchant updated');
+                return redirect()->route('merchants.index');
+            } catch (\Exception $exception) {
+                logger($exception->getMessage());
+                session()->flash('error', 'Merchant update failed, please try again later!');
+                return redirect()->back();
+            }
         }
+        return $this->fake();
+    }
+
+    /**
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function fake()
+    {
+        session()->flash('error', 'The ID does not match any merchant!');
+        return redirect()->back();
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param Merchant $merchant
+     * @param string $ses_money_id
      * @return string
      */
-    public function destroy(Merchant $merchant)
+    public function destroy(string $ses_money_id)
     {
-        try {
-            $merchant->delete();
-            return 'deleted';
-        } catch (\Exception $exception) {
-            Log::error($exception->getMessage());
+        $merchant = Merchant::where('ses_money_id', $ses_money_id)->first();
+        if ($merchant) {
+            try {
+                $merchant->delete();
+                session()->flash('success', 'Merchant deleted!');
+                return redirect()->route('merchants.index');
+            } catch (\Exception $exception) {
+                logger($exception->getMessage());
+                session()->flash('error', 'Merchant deletion failed, please try again!');
+                return redirect()->back();
+            }
         }
+        return $this->fake();
     }
 
     public function resetPassword($ses_money_id)
