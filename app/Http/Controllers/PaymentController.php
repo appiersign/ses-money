@@ -6,16 +6,18 @@ use App\Http\Requests\CreatePaymentRequest;
 use App\Jobs\CreatePaymentJob;
 use App\Jobs\MakePaymentJob;
 use App\Payment;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class PaymentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('merchant')->except('response');
+//        $this->middleware('merchant')->except('response', 'create', 'process', 'index');
     }
 
     /**
@@ -25,7 +27,8 @@ class PaymentController extends Controller
      */
     public function index()
     {
-        //
+        $payments = Payment::orderBy('created_at', 'desc')->paginate(10);
+        return view('pages.payment.index', compact('payments'));
     }
 
     /**
@@ -35,7 +38,33 @@ class PaymentController extends Controller
      */
     public function create()
     {
-        //
+        return view('pages.payment.create');
+    }
+
+    public function process(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'account_number' => 'bail|required|min:10|max:16',
+            'transaction_id' => 'bail|required|digits:12',
+            'merchant_id' => 'bail|required|exists:merchants',
+            'terminal_id' => 'bail|required|exists:terminals,ses_money_id|size:12',
+            'amount' => 'bail|required|digits:12',
+            'description' => 'bail|required|min:6|max:100',
+            'response_url' => 'bail|required|url',
+            'provider' => 'bail|required|size:3|in:MTN,TGO,ATL,VDF,VIS,MAS',
+            'cvv' => 'bail|required_if:provider,MAS,VIS',
+            'expiry_month' => 'bail|required_if:provider,MAS,VIS',
+            'expiry_year' => 'bail|required_if:provider,MAS,VIS'
+        ]);
+
+        $validator->validate();
+
+        $createPaymentJob = new CreatePaymentJob($request->all());
+        $this->dispatch($createPaymentJob);
+        $payment = new Payment();
+        $payment->handle($request);
+        $stan = Payment::where('transaction_id', $request->transaction_id)->where('merchant_id', $request->merchant_id)->first()->stan;
+        return redirect()->route('payments.show', ['stan' => $stan]);
     }
 
     /**
@@ -52,7 +81,7 @@ class PaymentController extends Controller
             $payment = new Payment();
             return response()->json(array_merge($request->all(), $payment->process($request)));
         } catch (\Exception $exception) {
-            Log::error($exception->getMessage());
+            logger($exception->getMessage());
             return response()->json(array_merge($request->all(), [
                 'status' => 'failed',
                 'code' => 5000,
@@ -65,12 +94,17 @@ class PaymentController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param Payment $payment
+     * @param string $stan
      * @return Payment
      */
-    public function show(Payment $payment): Payment
+    public function show(string $stan)
     {
-        return $payment;
+        $payment = Payment::where('stan', $stan)->first();
+        if ($payment) {
+            return view('pages.payment.show', compact('payment'));
+        }
+        session()->flash('error', 'Payment not found!');
+        return redirect()->route('payments');
     }
 
     /**
@@ -128,5 +162,34 @@ class PaymentController extends Controller
         }
         $payment = new Payment();
         $payment->response($response);
+    }
+
+    public function history()
+    {
+        return view('pages.payment.history');
+    }
+
+    public function handleHistory(Request $request)
+    {
+        $this->validate($request, [
+            'from'  =>  'required|string',
+            'to'    =>  'required|string'
+        ]);
+
+        return redirect()->route('payments.search', ['to' => $request->to, 'from' => $request->from]);
+    }
+
+    public function search(string $from, string $to)
+    {
+        $_from = Carbon::parse($from);
+        $_to = Carbon::parse($to);
+
+        if ($_to->diffInDays($_from) < 0 ){
+            session()->flash('error', 'The end date cannot be older than the start date');
+            return redirect()->back();
+        }
+
+        $payments = Payment::whereBetween('created_at', [$_from->startOfDay()->toDateTimeString(), $_to->endOfDay()->toDateTimeString()])->paginate(20);
+        return view('pages.payment.search', compact('payments'));
     }
 }

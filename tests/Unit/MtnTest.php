@@ -32,8 +32,8 @@ class MtnTest extends TestCase
 
     public function testCredit()
     {
-        $merchant = factory(Merchant::class)->create();
-        $transfer = factory(Transfer::class)->create([
+        $merchant = Merchant::inRandomOrder()->first();
+        $transfer = factory(Transfer::class)->make([
             "provider" => "MTN",
             "account_number" => "0249621938",
             "merchant_id" => $merchant->merchant_id,

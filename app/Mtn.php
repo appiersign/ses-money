@@ -64,7 +64,7 @@ class Mtn extends Model
             'info' => "Tekpulse",
             'amt' => $this->payment->getAmountAttribute(),
             'mobile' => '+233'.substr($this->payment->account_number, 1),
-            'billprompt' => '3',
+            'billprompt' => 2,
             'thirdpartyID' => $this->payment->stan
         );
 
@@ -79,8 +79,9 @@ class Mtn extends Model
             $this->payment->save();
 
             $this->responseCode = $response['responseCode'];
+            logger(json_encode($response));
         } catch (\Exception $exception) {
-            Log::error($exception->getMessage());
+            logger($exception->getMessage());
             $this->responseCode = 9000;
         }
 
@@ -112,6 +113,8 @@ class Mtn extends Model
             $response           = get_object_vars($response);
             $this->response     = get_object_vars($response['return']);
             $this->responseCode = $this->response['responseCode'];
+
+            logger(json_encode($this->response));
 
             $this->transfer->authorization_code = substr($this->transfer->authorization_code, 0, 3). $this->responseCode;
             $this->transfer->narration = $this->response['responseMessage'];

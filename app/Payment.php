@@ -5,6 +5,7 @@ namespace App;
 use App\Http\Requests\CreatePaymentRequest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class Payment extends Model
@@ -40,6 +41,20 @@ class Payment extends Model
      * @return array
      */
     public function process(CreatePaymentRequest $request): array
+    {
+        $this->request = $request;
+        if (in_array($this->request['provider'], ['MAS', 'VIS'])) {
+            $transaction = new Transaction($this->request['cvv'], $this->request['expiry_month'], $this->request['expiry_year']);
+        } else {
+            $transaction = new Transaction();
+        }
+
+        $payment = Payment::where('merchant_id', $this->request->merchant_id)->where('transaction_id', $this->request->transaction_id)->first();
+
+        return $transaction->debit($payment);
+    }
+
+    public function handle(Request $request)
     {
         $this->request = $request;
         if (in_array($this->request['provider'], ['MAS', 'VIS'])) {

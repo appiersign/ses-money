@@ -35,15 +35,20 @@
                     <span class="arrow"><i class="ti-angle-right"></i></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a class="sidebar-link" href="datatable.html">Credit</a></li>
-                    <li><a class="sidebar-link" href="datatable.html">Debit</a></li>
+                    <li><a class="sidebar-link" href="{{ route('transfers.index') }}">Transfers</a></li>
+                    <li><a class="sidebar-link" href="{{ route('payments.index') }}">Payments</a></li>
                 </ul>
             </li>
-            <li class="nav-item">
-                <a class="sidebar-link" href="calendar.html">
+            <li class="nav-item dropdown">
+                <a class="dropdown-toggle" href="javascript:void(0);">
                     <span class="icon-holder"><i class="c-deep-orange-500 ti-calendar"></i> </span>
                     <span class="title">History</span>
+                    <span class="arrow"><i class="ti-angle-right"></i></span>
                 </a>
+                <ul class="dropdown-menu">
+                    <li><a class="sidebar-link" href="{{ route('transfers.history') }}">Transfers</a></li>
+                    <li><a class="sidebar-link" href="{{ route('payments.history') }}">Payments</a></li>
+                </ul>
             </li>
             <li class="nav-item">
                 <a class="sidebar-link" href="chat.html">
