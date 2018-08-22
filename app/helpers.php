@@ -23,6 +23,12 @@ function amountToMinor($amount): string
     return str_pad($string, 12, '0', STR_PAD_LEFT);
 }
 
+function stan()
+{
+    $microtime = str_replace('.', '', microtime(true));
+    return substr($microtime, 0, 12);
+}
+
 function sum_amount(array $transactions)
 {
     $sum = 0.00;
