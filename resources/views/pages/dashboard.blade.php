@@ -59,7 +59,7 @@
             </div>
         </div>
         <div class="masonry-item col-12">
-            <div class="bgc-white bd bdrs-3 p-20 mB-20">
+            <div class="bgc-white bd bdrs-3 p-20 mB-20 table-responsive">
                 <h4 class="c-grey-900 mB-20">Transactions</h4>
                 <table class="table table-bordered table-striped">
                     <thead>

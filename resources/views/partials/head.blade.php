@@ -1,4 +1,5 @@
 <title>Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
     #loader {
         transition: all .3s ease-in-out;
