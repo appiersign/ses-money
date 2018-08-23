@@ -51,7 +51,7 @@
                 </ul>
             </li>
             <li class="nav-item">
-                <a class="sidebar-link" href="chat.html">
+                <a class="sidebar-link" href="{{ route('terminals.index') }}">
                     <span class="icon-holder"><i class="c-deep-purple-500 ti-mobile"></i> </span>
                     <span class="title">Terminals</span>
                 </a>
