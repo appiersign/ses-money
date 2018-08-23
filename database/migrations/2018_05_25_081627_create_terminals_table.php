@@ -20,6 +20,7 @@ class CreateTerminalsTable extends Migration
             $table->string('name')->index();
             $table->string('type')->default('web');
             $table->string('pin')->default('$2y$10$QbRGismi0uPbVV81dCoiHOJCpQTS5IPb93SDlUzwXjS2n1qJc/Rk2')->comment('default pin is 0000');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
 

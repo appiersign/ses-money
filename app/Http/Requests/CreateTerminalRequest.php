@@ -3,7 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Merchant;
+use App\Terminal;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class CreateTerminalRequest extends FormRequest
 {
@@ -25,7 +27,20 @@ class CreateTerminalRequest extends FormRequest
     public function rules()
     {
         return [
-            'merchant_id' => 'required|exits:merchants',
+            'merchant' => 'required|exists:merchants,id',
+            'name'  =>  'required|string|',
+            'type'  =>  'required|string|in:web,offline'
         ];
+    }
+
+    public function withValidator(Validator $validator)
+    {
+        if (count(explode('/', $this->getPathInfo())) < 2){
+            $validator->after(function ($validator){
+                if (Terminal::where('merchant_id', $this->input('merchant'))->where('name', $this->input('name'))->count()){
+                    $validator->errors()->add('error', 'Terminal name already used!');
+                }
+            });
+        }
     }
 }

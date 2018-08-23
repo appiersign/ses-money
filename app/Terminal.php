@@ -10,9 +10,10 @@ class Terminal extends Model
 
     protected $hidden = ['pin'];
 
-    public function setSesMoneyIdAttribute($id)
+    public function setSesMoneyIdAttribute()
     {
-        $this->attributes['ses_money_id'] = 'SES-' . str_pad($id, 8, '0', STR_PAD_LEFT);
+        $this->attributes['ses_money_id'] = 'SES-' . str_pad($this->attributes['id'], 8, '0', STR_PAD_LEFT);
+        return $this;
     }
 
     public function register(array $data)
@@ -21,5 +22,10 @@ class Terminal extends Model
         $terminal->setSesMoneyIdAttribute($terminal->id);
         $terminal->save();
         return $terminal;
+    }
+
+    public function merchant()
+    {
+        return $this->belongsTo(Merchant::class);
     }
 }

@@ -13,6 +13,8 @@ Route::post('transfers/history', 'TransferController@handleHistory')->name('tran
 Route::get('transfers/history/{from}/{to}', 'TransferController@search')->name('transfers.search');
 Route::resource('transfers', 'TransferController');
 
+Route::resource('terminals', 'TerminalController');
+
 //Route::get('payments', 'PaymentController@index');
 Route::get('merchants/payments/make', 'PaymentController@create');
 Route::post('merchants/payments/process', 'PaymentController@process');
